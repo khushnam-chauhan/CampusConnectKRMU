@@ -1,21 +1,20 @@
-import React from 'react';
+import React from "react";
 
 const UploadsSection = ({ formData, handleChange, API_URL }) => {
-    const getImageUrl = (fileData) => {
-        if (!fileData) return null;
-        
-        if (typeof fileData === "string") {
-          if (fileData.startsWith("http")) {
-            return fileData;
-          }
-          if (fileData.startsWith("/")) {
-            return `${API_URL}${fileData}`;
-          }
-          return `${API_URL}/${fileData}`;
-        }
-        
-        return URL.createObjectURL(fileData);
-      };
+  const getImageUrl = (fileData) => {
+    if (!fileData) return null;
+
+    if (typeof fileData === "string") {
+      if (fileData.startsWith("http")) {
+        return fileData;
+      }
+      // Ensure consistent URL construction
+      return `${API_URL}${fileData.startsWith("/") ? "" : "/"}${fileData}`;
+    }
+
+    // For new uploads (File objects)
+    return URL.createObjectURL(fileData);
+  };
 
   return (
     <div className="profile-upload-section1">
@@ -25,6 +24,7 @@ const UploadsSection = ({ formData, handleChange, API_URL }) => {
             <img
               src={getImageUrl(formData.profilePhoto)}
               alt="Profile Preview"
+              onError={(e) => console.error("Failed to load profile photo:", e.target.src)} // Debug image loading
             />
           ) : (
             <div className="profile-placeholder1">
