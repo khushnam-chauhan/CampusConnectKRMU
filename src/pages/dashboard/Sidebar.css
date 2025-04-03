@@ -1,0 +1,198 @@
+/* Container for the sidebar */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: #2c3e50; 
+  color: #ecf0f1; 
+  transition: transform 0.3s ease; 
+  z-index: 1000;
+}
+
+/* Closed state - hidden off-screen */
+.sidebar-container.closed {
+  width: 60px; 
+  transform: translateX(-100%);
+}
+
+/* Open state - slide in */
+.sidebar-container.open {
+  width: 250px;
+  transform: translateX(0);
+}
+
+/* Hamburger Icon Styling */
+.hamburger-icon {
+  position: absolute;
+  top: 20px;
+  left: 15px;
+  width: 30px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1001;
+}
+
+.hamburger-icon span {
+  width: 100%;
+  height: 3px;
+  background: #ecf0f1;
+  border-radius: 2px;
+}
+
+/* Sidebar Content Wrapper */
+.sidebar-content {
+  height: 100%; /* Full height of sidebar */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Close Button */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #ecf0f1;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-btn:hover {
+  color: #e74c3c; /* Red on hover */
+}
+
+/* Navigation styling */
+.sidebar-nav {
+  flex: 1; /* Take remaining space */
+  padding: 20px 0;
+}
+
+/* Menu list */
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure it fits within height */
+}
+
+/* User info section */
+.menu-list .user-info {
+  padding: 10px 10px;
+  border-bottom: 1px solid #34495e;
+  text-align: center;
+}
+
+/* Profile picture */
+.menu-list .profile-pic {
+  margin-bottom: 10px;
+}
+
+.menu-list .profile-img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ecf0f1;
+}
+
+/* Greeting text */
+.menu-list .user-info p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Loading state */
+.menu-list .user-info p:empty::before {
+  content: "Loading...";
+  color: #bdc3c7;
+}
+
+/* Menu items */
+.menu-list .menu-item {
+  padding: 0;
+}
+
+/* NavLink styling */
+.menu-list .menu-item a {
+  display: block;
+  padding: 15px 20px;
+  color: #ecf0f1;
+  text-decoration: none;
+  font-size: 15px;
+  transition: background 0.2s ease;
+}
+
+/* Hover effect */
+.menu-list .menu-item a:hover {
+  background: #34495e;
+}
+
+/* Active link styling */
+.menu-list .menu-item a.active {
+  background: #3498db;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Logout button container */
+.menu-list .logout {
+  margin-top: auto; /* Push logout to bottom */
+  padding: 15px 20px;
+}
+
+/* Logout button */
+.menu-list .logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+/* Hover effect for logout */
+.menu-list .logout-btn:hover {
+  background: #c0392b;
+}
+
+/* Remove scroll */
+.sidebar-container, .sidebar-content, .sidebar-nav {
+  overflow: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sidebar-container.open {
+    width: 200px;
+  }
+
+  .sidebar-container.closed {
+    width: 0;
+  }
+
+  .hamburger-icon {
+    left: 10px;
+  }
+
+  .menu-list .menu-item a {
+    font-size: 14px;
+    padding: 12px 15px;
+  }
+}

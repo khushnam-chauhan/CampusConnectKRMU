@@ -1,0 +1,350 @@
+.profile-container {
+    max-width: 1200px;
+    margin: 0;
+    padding: 10px;
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+  }
+  
+  /* Header styling */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .logo-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .logout-btn {
+    background-color: #ff0000;
+    color: white;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .logout-btn:hover {
+    background-color: #e00000;
+  }
+  
+  /* Profile content */
+  .profile-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  /* Basic info section */
+  .profile-basic-info {
+    display: flex;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .info-text {
+    flex: 1;
+  }
+  
+  .info-text p {
+    margin: 10px 0;
+    font-size: 16px;
+  }
+  
+  .profile-photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-left: 20px;
+  }
+  
+  .profile-photo-container {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .profile-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .profile-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #e0e0e0;
+  }
+  
+  .edit-btn {
+    background-color: #0057d2;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  .edit-btn:hover {
+    background-color: #0046a6;
+  }
+  
+  .upload-btn {
+    background-color: #0057d2;
+    color: white;
+    border: none;
+    padding: 8px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+  
+  .upload-btn:hover {
+    background-color: #0046a6;
+  }
+  
+  /* Section containers (education, skills, certifications, resume, experience) */
+  .section-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 20px;
+  }
+  
+  .section-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  /* Education section */
+  .education-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    width: 100%;
+  }
+  
+  .education-item {
+    background-color: #f1f5ff;
+    padding: 15px;
+    border-radius: 8px;
+    transition: transform 0.2s;
+  }
+  
+  .education-item:hover {
+    transform: translateY(-3px);
+  }
+  
+  .education-item h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #0057d2;
+  }
+  
+  .education-item p {
+    margin: 5px 0;
+    color: #444;
+  }
+  
+ /* Skills section as a grid */
+.skills-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+  
+  .skill-tag {
+    background-color: #e0f0ff;
+    color: #0057d2;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .skill-tag:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    background-color: #d0e8ff;
+  }
+  
+  /* Make sure the grid is responsive */
+  @media (max-width: 480px) {
+    .skills-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  /* Certification cards */
+  .certification-card {
+    background-color: #e8e8ff;
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: calc(50% - 10px);
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .certification-card.clickable {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+  }
+  
+  .certification-card.clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  .certification-card.empty {
+    color: #777;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .view-indicator {
+    color: #0057d2;
+    font-size: 12px;
+    margin-top: 8px;
+    font-style: italic;
+  }
+  
+  /* Resume card */
+  .resume-card {
+    background-color: #e8e8ff;
+    padding: 15px;
+    border-radius: 8px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .resume-card.clickable {
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .resume-card.clickable:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  /* Experience cards */
+  .experience-cards {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  
+  .experience-card {
+    background-color: #e8e8ff;
+    padding: 15px;
+    border-radius: 8px;
+    min-width: 250px;
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .experience-card h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #0057d2;
+  }
+  
+  .experience-card p {
+    margin: 5px 0;
+  }
+  
+  .experience-details {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #ccc;
+    font-style: italic;
+  }
+  
+  .experience-card.empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #777;
+    width: 100%;
+  }
+  
+  /* Hide original tabs but keep for functionality */
+  .hidden-tabs {
+    display: none;
+  }
+  
+  /* Make it responsive */
+  @media (max-width: 768px) {
+    .profile-basic-info {
+      flex-direction: column;
+    }
+    
+    .profile-photo-section {
+      margin-left: 0;
+      margin-top: 20px;
+    }
+    
+    .certification-card {
+      max-width: 100%;
+    }
+    
+    .education-grid {
+      grid-template-columns: 1fr;
+    }
+  }

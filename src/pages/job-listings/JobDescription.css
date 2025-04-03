@@ -1,0 +1,255 @@
+.job-description-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.job-description__container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.job-description__close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #333;
+}
+
+.job-description__close-btn:hover {
+  color: #e74c3c;
+}
+
+.job-description__header2 {
+  margin-bottom: 20px;
+}
+
+.job-title-head2 {
+  font-size: 28px;
+  color: #2c3e50;
+  margin: 0 0 15px;
+}
+
+.job-header-details2 {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.company-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.job-header-company2 {
+  flex: 1;
+}
+
+.company-name2 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.company-website2 a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.company-website2 a:hover {
+  text-decoration: underline;
+}
+
+.jd-layout {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.job-description__details2 {
+  flex: 1;
+}
+
+.job-info2 {
+  margin-bottom: 10px;
+}
+
+.job-info2 span {
+  font-weight: 600;
+  color: #555;
+  margin-right: 5px;
+}
+
+.job-info2 p {
+  margin: 0;
+  display: inline;
+}
+
+.job-description__body2 h2 {
+  font-size: 22px;
+  color: #2c3e50;
+  margin: 20px 0 10px;
+}
+
+.job-description__body2 p {
+  color: #666;
+  line-height: 1.6;
+}
+
+.job-description__skills2 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.job-description__skill-tag2 {
+  background: #ecf0f1;
+  padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 14px;
+  color: #333;
+}
+
+.job-description__footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+}
+
+.job-description__apply-btn,
+.job-description__close-details-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.job-description__apply-btn {
+  background: #28a745;
+  color: #fff;
+}
+
+.job-description__apply-btn:hover {
+  background: #218838;
+}
+
+.job-description__close-details-btn {
+  background: #6c757d;
+  color: #fff;
+}
+
+.job-description__close-details-btn:hover {
+  background: #5a6268;
+}
+
+/* Application Form Modal */
+.apply-form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.apply-form-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.apply-form-container h2 {
+  font-size: 24px;
+  color: #2c3e50;
+  margin: 0 0 20px;
+}
+
+.apply-form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.apply-form-container input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.apply-form-container input[type="file"] {
+  padding: 5px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.form-actions button[type="submit"] {
+  background: #28a745;
+  color: #fff;
+}
+
+.form-actions button[type="submit"]:hover {
+  background: #218838;
+}
+
+.form-actions button[type="button"] {
+  background: #6c757d;
+  color: #fff;
+}
+
+.form-actions button[type="button"]:hover {
+  background: #5a6268;
+}
+
+.success-msg {
+  color: #28a745;
+  text-align: center;
+  font-size: 18px;
+}
+
+.error-msg {
+  color: #e74c3c;
+  text-align: center;
+  font-size: 14px;
+  margin: 10px 0;
+}

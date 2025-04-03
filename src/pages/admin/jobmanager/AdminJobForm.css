@@ -1,0 +1,122 @@
+/* AdminJobForm.css */
+.job-description__body2 {
+    padding: 0;
+  }
+  
+  .job-description__body2 input,
+  .job-description__body2 select,
+  .job-description__body2 textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-top: 5px;
+    outline: none;
+    transition: border-color 0.3s ease;
+  }
+  
+  .job-description__body2 input:focus,
+  .job-description__body2 select:focus,
+  .job-description__body2 textarea:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  }
+  
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 10px 0;
+  }
+  
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .checkbox-label input {
+    accent-color: #007bff;
+  }
+  
+  .skills-input-container {
+    border: 1px solid #d1d1d1;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
+  
+  .skills-input-container input {
+    border: none;
+    margin: 0;
+  }
+  
+  .category-input-container {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .category-input-wrapper {
+    display: flex;
+    gap: 0;
+  }
+  
+  .category-input-wrapper input {
+    border-radius: 6px 0 0 6px;
+  }
+  
+  .add-category-btn {
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+  }
+  
+  .add-category-btn:hover {
+    background: #357ab8;
+  }
+  
+  .category-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d1d1d1;
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+  }
+  
+  .category-dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .category-dropdown-item:hover {
+    background: #f5f5f5;
+  }
+  
+  .remove-skill {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 16px;
+    cursor: pointer;
+    margin-left: 5px;
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
