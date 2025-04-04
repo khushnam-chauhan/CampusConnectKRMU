@@ -57,8 +57,8 @@ const ProfilePage = () => {
               <strong>Area of interest:</strong> {user.areaOfInterest || "N/A"}
             </p>
           </div>
-          <div className="profile-photo-section">
-            <div className="profile-photo-container">
+          <div className="profile-photo-section1">
+            <div className="profile-photo-container1">
               {user.profilePhoto ? (
                 <img
                   src={
@@ -67,10 +67,10 @@ const ProfilePage = () => {
                       : `${import.meta.env.VITE_BACKEND_URL}${user.profilePhoto}`
                   }
                   alt="Profile"
-                  className="profile-photo"
+                  className="profile-photo1"
                 />
               ) : (
-                <div className="profile-photo-placeholder"></div>
+                <div className="profile-photo-placeholder1"></div>
               )}
             </div>
             <Link to="/student-details">
