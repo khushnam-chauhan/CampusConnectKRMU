@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 function TrainingCard() {
   return (
     <div>
-         <Link to="/trainings/" className="training-item">
+         <Link to="/trainings" className="training-item">
           <div className="book-icon">
             <Book size={32} />
           </div>
