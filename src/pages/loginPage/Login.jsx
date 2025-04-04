@@ -22,7 +22,7 @@ const Login = () => {
     
     try {
       // Login request
-      const res = await axios.post("http://localhost:3000/api/auth/login", formData, {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, formData, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -35,7 +35,7 @@ const Login = () => {
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
         // Fetch user profile after login
-        const profileRes = await axios.get("http://localhost:3000/api/profile/me", {
+        const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/profile/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
