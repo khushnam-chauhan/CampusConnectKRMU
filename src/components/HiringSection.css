@@ -1,33 +1,9 @@
-.hiring-section {
+.hiring-section{
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 3rem 5%;
-  }
-  
-  .hiring-heading {
+}
+.hiring-heading{
     font-size: 40px;
-    text-align: center;
-    margin-bottom: 1.5rem;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 1024px) {
-    .hiring-heading {
-      font-size: 36px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .hiring-heading {
-      font-size: 32px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .hiring-heading {
-      font-size: 28px;
-    }
-  }
-  
+}

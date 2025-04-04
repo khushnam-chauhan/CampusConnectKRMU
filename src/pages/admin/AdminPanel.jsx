@@ -111,7 +111,7 @@ const api = {
       const queryParams = new URLSearchParams();
       if (filters?.status) queryParams.append('status', filters.status);
       if (filters?.jobId) queryParams.append('jobId', filters.jobId);
-      const response = await axios.get(`${API_BASE_URL}/jobs/applications?${queryParams}`, getAuthConfig());
+      const response = await axios.get(`${API_BASE_URL}/applications?${queryParams}`, getAuthConfig());
       return response.data;
     } catch (error) {
       console.error('Error fetching applications:', error);
@@ -120,7 +120,7 @@ const api = {
   },
   updateApplicationStatus: async (appId, status) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/jobs/applications/${appId}`, { status }, getAuthConfig());
+      const response = await axios.put(`${API_BASE_URL}/applications/${appId}`, { status }, getAuthConfig());
       return response.data;
     } catch (error) {
       console.error('Error updating application status:', error);
@@ -171,7 +171,7 @@ const AdminPanel = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    window.location.href = "/";
+    window.location.href = "/login";
   };
 
   const [activeSection, setActiveSection] = useState('dashboard');

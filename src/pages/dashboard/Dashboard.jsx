@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { Book, Menu } from "lucide-react"
 import "./dashboard.css"
-import TrainingCard from "../../components/TrainingCard"
+import TrainingCard from "../../components/trainingCard"
 import DashboardCard from "../../components/DashboardCard"
 
 export default function CampusConnectDashboard() {

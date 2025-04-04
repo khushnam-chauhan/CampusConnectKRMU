@@ -11,7 +11,7 @@
   align-items: center;
   flex-direction: column;
   font-family: "Montserrat", sans-serif;
-  height: calc(100vh - 60px);
+  height: calc(100vh-60px);
   margin: 0;
 }
 
@@ -42,11 +42,11 @@
   visibility: visible;
   opacity: 1;
 }
-
-.sign-in-container {
+.sign-in-container{
   display: flex;
   margin-top: 2rem;
 }
+
 
 .auth-container .sign-up-container {
   left: 0;
@@ -55,10 +55,9 @@
   opacity: 0;
 }
 
-.sign-up-container {
+.sign-up-container{
   margin-top: 2rem;
 }
-
 .auth-container .container.right-panel-active .sign-in-container {
   transform: translateX(100%);
   opacity: 0;
@@ -201,94 +200,4 @@
   margin: 0 5px;
   height: 40px;
   width: 40px;
-}
-
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .auth-container .container {
-    width: 80%;
-    min-height: auto;
-  }
-
-  .auth-container .form-container {
-    width: 60%;
-  }
-
-  .auth-container .sign-in-container,
-  .auth-container .sign-up-container {
-    margin-top: 1rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .auth-container .container {
-    width: 100%;
-    min-height: auto;
-  }
-
-  .auth-container .form-container {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .auth-container .sign-in-container,
-  .auth-container .sign-up-container {
-    margin-top: 0;
-  }
-
-  .auth-container input,
-  .auth-container button {
-    padding: 10px 15px;
-    font-size: 14px;
-  }
-
-  .auth-container button {
-    padding: 10px 30px;
-    font-size: 13px;
-  }
-
-  .auth-container .overlay-container {
-    width: 60%;
-  }
-
-  .auth-container .overlay {
-    width: 300%;
-  }
-
-  .auth-container .overlay-left,
-  .auth-container .overlay-right {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .auth-container .container {
-    width: 100%;
-    min-height: auto;
-    padding: 1rem;
-  }
-
-  .auth-container .form-container {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .auth-container input,
-  .auth-container button {
-    padding: 8px 12px;
-    font-size: 12px;
-  }
-
-  .auth-container button {
-    padding: 8px 25px;
-    font-size: 12px;
-  }
-
-  .auth-container .overlay-container {
-    width: 100%;
-  }
-
-  .auth-container .overlay {
-    width: 400%;
-  }
 }

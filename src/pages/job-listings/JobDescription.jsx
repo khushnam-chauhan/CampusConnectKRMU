@@ -168,7 +168,7 @@ const JobDescriptionPage = ({ job, onClose, onApply, isAdmin = false }) => {
       {isApplying && (
         <div className="apply-form-overlay">
           <div className="apply-form-container">
-            <h2>Apply for {job.profiles}</h2>
+            <h2>Applied for {job.profiles}</h2>
             {submitStatus === "success" ? (
               <p className="success-msg">Application submitted successfully! 🎉</p>
             ) : (

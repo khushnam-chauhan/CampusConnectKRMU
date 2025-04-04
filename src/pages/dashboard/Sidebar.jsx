@@ -17,7 +17,7 @@ const Sidebar = ({ isOpen, onItemClick }) => {
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate("/authContainer");
+    navigate("/auth-Container");
   };
 
   const menuItems = [

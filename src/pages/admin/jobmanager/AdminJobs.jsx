@@ -534,7 +534,7 @@ const AdminJobManagement = () => {
                 <div className="job-description__details2">
                   <div className="job-info2">
                     <span>Referred by:</span>
-                    <p>{currentJob.reference}</p>
+                    <p>{currentJob.contactPersonName}</p>
                   </div>
                   <div className="job-info2">
                     <span>Category:</span>

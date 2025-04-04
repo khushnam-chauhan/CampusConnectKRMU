@@ -8,8 +8,8 @@ const placedStudents = [
     name: "Raj Sharma (B.tech)",
     designation: "Software Engineer",
     organization: "Google",
-  },
-  {
+},
+{
     id: 2,
     image: "https://img.freepik.com/free-photo/anime-style-portrait-young-student-attending-school_23-2151125048.jpg",
     name: "Khushnam Chauhan (MCA)",
@@ -69,7 +69,7 @@ const placedStudents = [
 
 function Placed() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const studentsPerPage = 3; // Show 3 students at a time on larger screens
+  const studentsPerPage = 3;
   const totalSlides = Math.ceil(placedStudents.length / studentsPerPage);
 
   const nextSlide = () => {
@@ -82,7 +82,9 @@ function Placed() {
 
   return (
     <div className="placedStudents">
-      <div className="placed-head">Placed Students</div>
+      <div className="placed-head">
+        Placed Students
+      </div>
       <div className="slider-container">
         <button className="prev-btn" onClick={prevSlide}>&#10094;</button>
         <div className="placed-list">

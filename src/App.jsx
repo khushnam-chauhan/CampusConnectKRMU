@@ -9,7 +9,6 @@ import AuthContainer from "./pages/loginPage/AuthContainer";
 import StudentDetails from "./pages/studentform/StudentDetails";
 import CampusConnectDashboard from "./pages/dashboard/Dashboard";
 import CDCTrainings from "./pages/job-listings/CDCTrainings";
-import Applications from "./pages/job-listings/Applications";
 import Notifications from "./pages/job-listings/Notifications";
 import DashboardLayout from "./layouts/DashboardLayout";
 import CV from "./pages/job-listings/CV";
@@ -18,6 +17,7 @@ import JobListingPage from "./pages/job-listings/JobListings";
 import JobPostForm from "./pages/admin/JobPosting";
 import AdminPanel from "./pages/admin/AdminPanel";
 import ProtectedRoute from './redux/ProtectedRoute';
+import MyApplications from "./pages/job-listings/Applications";
 
 function App() {
   const dispatch = useDispatch();
@@ -106,7 +106,7 @@ function App() {
           path="/my-applications" 
           element={
             <ProtectedRoute allowedRoles={['student']}>
-              <DashboardLayout><Applications /></DashboardLayout>
+              <DashboardLayout><MyApplications /></DashboardLayout>
             </ProtectedRoute>
           } 
         />

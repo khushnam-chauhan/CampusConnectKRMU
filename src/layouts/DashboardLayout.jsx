@@ -1,10 +1,28 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom"; // For detecting current page
 import Sidebar from "../pages/dashboard/Sidebar";
 import { Menu } from "lucide-react";
 import "../pages/dashboard/dashboard.css"; 
 
 const DashboardLayout = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation(); // Hook to get current URL
+
+  // Menu items same as in Sidebar (to map path to name)
+  const menuItems = [
+    { name: "Dashboard", path: "/dashboard" },
+    { name: "Home", path: "/" },
+    { name: "Job Listings", path: "/job-listings" },
+    { name: "My Applications", path: "/my-applications" },
+    { name: "CDC Trainings", path: "/trainings" },
+    { name: "Notifications", path: "/notifications" },
+    { name: "Profile", path: "/profile" },
+    { name: "Admin Dashboard", path: "/admin-mgmnt" },
+    { name: "Applications", path: "/admin-applications" }, 
+  ];
+
+  // Find current page name based on location.pathname
+  const currentPage = menuItems.find((item) => item.path === location.pathname)?.name || "Unknown";
 
   return (
     <div className="dashboard-container">
@@ -20,7 +38,7 @@ const DashboardLayout = ({ children }) => {
           >
             <Menu size={20} />
           </button>
-          <h1 className="portal-title">CampusConnect - Student Dashboard</h1>
+          <h1 className="portal-title">CampusConnect - {currentPage}</h1>
         </header>
         {children}
       </div>

@@ -9,7 +9,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, formData, {
+      const res = await axios.post("http://localhost:3000/api/auth/register", formData, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -23,7 +23,7 @@ const Signup = () => {
         if (res.data.role === "student") {
           window.location.href = "/student-details"; // Redirect to student details page
         } else {
-          window.location.href = "/auth-Container"; // Redirect to the auth container for other roles
+          window.location.href = "/authContainer"; // Redirect to the auth container for other roles
         }
       } else {
         alert("Unexpected response from server.");

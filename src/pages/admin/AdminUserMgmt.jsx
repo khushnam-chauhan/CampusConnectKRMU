@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from "axios"; // Added for API call
 import './AdminUserManagement.css';
 
 const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRole, createUser }) => {
@@ -19,9 +20,10 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
     rollNo: ''
   });
   const [showAddUser, setShowAddUser] = useState(false);
-  const [showEditUser, setShowEditUser] = useState(false); // New state for edit modal
-  const [editingUserId, setEditingUserId] = useState(null); // Track user being edited
+  const [showEditUser, setShowEditUser] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
   const [modalUser, setModalUser] = useState(null);
+  const API_URL = import.meta.env.VITE_BACKEND_URL; // Assuming you have this in your env
 
   useEffect(() => {
     loadUsers();
@@ -35,7 +37,6 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
         search: searchTerm || null,
       };
       const response = await fetchUsers(filters);
-      console.log('fetchUsers response:', response);
       let userData;
       if (Array.isArray(response)) {
         userData = response;
@@ -59,22 +60,18 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
-    if (!createUser || typeof createUser !== 'function') {
-      setError('Create user functionality is not available. Please contact support.');
-      return;
-    }
     try {
       const newUser = await createUser(userForm);
       setUsers([...users, newUser]);
       setShowAddUser(false);
       setUserForm({ fullName: '', email: '', password: '', mobileNo: '', role: 'student', status: 'active', rollNo: '' });
-      setError(null); // Clear any previous error
+      setError(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to create user');
       console.error('Error creating user:', err);
     }
   };
-  
+
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
@@ -85,7 +82,7 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
       setShowEditUser(false);
       setEditingUserId(null);
       setUserForm({ fullName: '', email: '', password: '', mobileNo: '', role: 'student', status: 'active', rollNo: '' });
-      setError(null); // Clear any previous error
+      setError(null);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to update user');
       console.error('Error updating user:', err);
@@ -127,7 +124,7 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
       status: user.status || 'active',
       rollNo: user.rollNo || ''
     });
-    setShowEditUser(true); // Open edit modal
+    setShowEditUser(true);
   };
 
   const cancelEdit = () => {
@@ -196,8 +193,22 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
     }));
   };
 
-  const openUserModal = (user) => {
-    setModalUser(user);
+  const openUserModal = async (user) => {
+    if (user.role === "student") {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${API_URL}/profile/user/${user._id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setModalUser(response.data); // Full student profile data
+      } catch (err) {
+        setError("Failed to fetch student details.");
+        console.error("Error fetching student details:", err.response?.data || err.message);
+        setModalUser(user);
+      }
+    } else {
+      setModalUser(user); // Non-student users get basic data
+    }
   };
 
   const closeUserModal = () => {
@@ -205,10 +216,8 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
   };
 
   const formatDate = (date) => {
-    if (!date || isNaN(new Date(date))) {
-      return 'Not available';
-    }
-    return new Date(date).toLocaleDateString();
+    if (!date || isNaN(new Date(date))) return 'Not available';
+    return new Date(date).toLocaleString();
   };
 
   return (
@@ -513,80 +522,174 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
       )}
 
       {modalUser && (
-        <div className="modal">
-          <div className="modal-content">
-            <h3>User Details</h3>
-            <div className="user-details">
-              <div className="detail-section">
-                <h4>User Information</h4>
-                <div className="detail-grid">
-                  <div>
-                    <p><strong>ID:</strong> {modalUser._id}</p>
-                    <p><strong>Name:</strong> {modalUser.fullName}</p>
-                    <p><strong>Email:</strong> {modalUser.email}</p>
-                  </div>
-                  <div>
-                    <p><strong>Mobile:</strong> {modalUser.mobileNo || 'Not provided'}</p>
-                    <p><strong>Role:</strong> {modalUser.role}</p>
-                    <p><strong>Status:</strong> {modalUser.status || 'active'}</p>
-                  </div>
+  <div className="modal">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h3>{modalUser.role === "student" ? "Student Profile" : "User Details"}</h3>
+        {modalUser.profilePhoto && (
+          <div className="profile-photo-container">
+            <img
+              src={`${API_URL}${modalUser.profilePhoto}`}
+              alt={`${modalUser.fullName}'s Profile`}
+              className="profile-photo"
+              onError={(e) => (e.target.src = "/default-avatar.png")} // Fallback image
+            />
+          </div>
+        )}
+      </div>
+      <div className="user-details">
+        <div className="detail-section">
+          <h4>User Information</h4>
+          <div className="detail-grid">
+            <div>
+              <p><strong>ID:</strong> {modalUser._id}</p>
+              <p><strong>Name:</strong> {modalUser.fullName}</p>
+              <p><strong>Email:</strong> {modalUser.email}</p>
+            </div>
+            <div>
+              <p><strong>Mobile:</strong> {modalUser.mobileNo || 'Not provided'}</p>
+              <p><strong>Role:</strong> {modalUser.role}</p>
+              <p><strong>Status:</strong> {modalUser.status || 'active'}</p>
+            </div>
+          </div>
+        </div>
+
+        {modalUser.role === 'student' && (
+          <>
+            <div className="detail-section">
+              <h4>Personal Information</h4>
+              <div className="detail-grid">
+                <div>
+                  <p><strong>Roll Number:</strong> {modalUser.rollNo || 'Not provided'}</p>
+                  <p><strong>WhatsApp:</strong> {modalUser.whatsappNo || 'Not provided'}</p>
+                  <p><strong>Father's Name:</strong> {modalUser.fatherName || 'Not provided'}</p>
                 </div>
-              </div>
-              {modalUser.role === 'student' && (
-                <div className="detail-section">
-                  <h4>Student Information</h4>
-                  <div className="detail-grid">
-                    <div>
-                      <p><strong>Roll Number:</strong> {modalUser.rollNo || 'Not provided'}</p>
-                      <p><strong>WhatsApp:</strong> {modalUser.whatsappNo || 'Not provided'}</p>
-                      <p><strong>School:</strong> {modalUser.school || 'Not provided'}</p>
-                    </div>
-                    <div>
-                      <p><strong>Course Aggregate:</strong> {modalUser.courseAggregate || 'Not provided'}</p>
-                      <p><strong>Ready to Relocate:</strong> {modalUser.readyToRelocate ? 'Yes' : 'No'}</p>
-                      <p><strong>Area of Interest:</strong> {modalUser.areaOfInterest || 'Not provided'}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div className="detail-section">
-                <h4>Activity</h4>
-                <div className="detail-grid">
-                  <div><p><strong>Created:</strong> {new Date(modalUser.createdAt).toLocaleString() || 'Not available'}</p></div>
-                  <div><p><strong>Last Updated:</strong> {new Date(modalUser.updatedAt).toLocaleString() || 'Not available'}</p></div>
-                </div>
-              </div>
-              <div className="role-change-section">
-                <h4>Change Role</h4>
-                <div className="role-buttons">
-                  <button 
-                    onClick={() => handleChangeRole(modalUser._id, 'student')}
-                    className={`role-button ${modalUser.role === 'student' ? 'active' : ''}`}
-                    disabled={modalUser.role === 'student'}
-                  >
-                    Student
-                  </button>
-                  <button 
-                    onClick={() => handleChangeRole(modalUser._id, 'staff')}
-                    className={`role-button ${modalUser.role === 'staff' ? 'active' : ''}`}
-                    disabled={modalUser.role === 'staff'}
-                  >
-                    Staff
-                  </button>
-                  <button 
-                    onClick={() => handleChangeRole(modalUser._id, 'admin')}
-                    className={`role-button ${modalUser.role === 'admin' ? 'active' : ''}`}
-                    disabled={modalUser.role === 'admin'}
-                  >
-                    Admin
-                  </button>
+                <div>
+                  <p><strong>Father's Number:</strong> {modalUser.fatherNumber || 'Not provided'}</p>
+                  <p><strong>Alternate Email:</strong> {modalUser.mailId || 'Not provided'}</p>
+                  <p><strong>Ready to Relocate:</strong> {modalUser.readyToRelocate ? 'Yes' : 'No'}</p>
                 </div>
               </div>
             </div>
-            <button onClick={closeUserModal} className="close-button">Close</button>
+
+            <div className="detail-section">
+              <h4>Education</h4>
+              <div className="detail-grid">
+                <div>
+                  <p><strong>10th:</strong> {modalUser.education?.tenth?.percentage || 'N/A'}% ({modalUser.education?.tenth?.passingYear || 'N/A'})</p>
+                  <p><strong>12th:</strong> {modalUser.education?.twelfth?.percentage || 'N/A'}% ({modalUser.education?.twelfth?.passingYear || 'N/A'})</p>
+                </div>
+                <div>
+                  <p><strong>Graduation:</strong> {modalUser.education?.graduation?.degree || 'N/A'} - {modalUser.education?.graduation?.percentageOrCGPA || 'N/A'} ({modalUser.education?.graduation?.passingYear || 'N/A'})</p>
+                  <p><strong>Masters:</strong> {modalUser.education?.masters?.degree || 'N/A'} - {modalUser.education?.masters?.percentageOrCGPA || 'N/A'} ({modalUser.education?.masters?.passingYear || 'N/A'})</p>
+                </div>
+              </div>
+              <p><strong>Backlogs:</strong> {modalUser.existingBacklogs || 'None'}</p>
+            </div>
+
+            <div className="detail-section">
+              <h4>School Information</h4>
+              <p><strong>School:</strong> {modalUser.school || 'Not provided'}</p>
+            </div>
+
+            <div className="detail-section">
+              <h4>Skills</h4>
+              <div className="skills-list">
+                {modalUser.skills && modalUser.skills.length > 0 ? (
+                  modalUser.skills.map((skill, index) => (
+                    <span key={index} className="skill-tag">{skill.name || skill}</span>
+                  ))
+                ) : (
+                  <p>Not provided</p>
+                )}
+              </div>
+            </div>
+
+            <div className="detail-section">
+              <h4>Certifications</h4>
+              {modalUser.certifications && modalUser.certifications.length > 0 ? (
+                <ul className="certifications-list">
+                  {modalUser.certifications.map((cert, index) => (
+                    <li key={index}>
+                      {cert.name} {cert.image && <a href={`${API_URL}${cert.image}`} target="_blank" rel="noopener noreferrer">[View]</a>}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No certifications</p>
+              )}
+            </div>
+
+            <div className="detail-section">
+              <h4>Experience</h4>
+              {modalUser.experience && modalUser.experience.length > 0 && modalUser.experience[0].hasExperience ? (
+                <ul className="experience-list">
+                  {modalUser.experience.map((exp, index) => (
+                    <li key={index}>
+                      <strong>{exp.organizationName}</strong> - {exp.duration || 'N/A'}<br />
+                      {exp.details || 'No details provided'}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No experience</p>
+              )}
+            </div>
+
+            <div className="detail-section">
+              <h4>Uploads</h4>
+              <div className="uploads-grid">
+                <p><strong>Resume:</strong> {modalUser.resume ? <a href={`${API_URL}${modalUser.resume}`} target="_blank" rel="noopener noreferrer">View Resume</a> : 'Not uploaded'}</p>
+                <p><strong>Profile Photo:</strong> {modalUser.profilePhoto ? <a href={`${API_URL}${modalUser.profilePhoto}`} target="_blank" rel="noopener noreferrer">View Photo</a> : 'Not uploaded'}</p>
+              </div>
+            </div>
+
+            <div className="detail-section">
+              <h4>Other Details</h4>
+              <p><strong>Area of Interest:</strong> {modalUser.areaOfInterest || 'Not provided'}</p>
+            </div>
+          </>
+        )}
+
+        <div className="detail-section">
+          <h4>Activity</h4>
+          <div className="detail-grid">
+            <div><p><strong>Created:</strong> {formatDate(modalUser.createdAt)}</p></div>
+            <div><p><strong>Last Updated:</strong> {formatDate(modalUser.updatedAt)}</p></div>
           </div>
         </div>
-      )}
+
+        <div className="role-change-section">
+          <h4>Change Role</h4>
+          <div className="role-buttons">
+            <button 
+              onClick={() => handleChangeRole(modalUser._id, 'student')}
+              className={`role-button ${modalUser.role === 'student' ? 'active' : ''}`}
+              disabled={modalUser.role === 'student'}
+            >
+              Student
+            </button>
+            <button 
+              onClick={() => handleChangeRole(modalUser._id, 'staff')}
+              className={`role-button ${modalUser.role === 'staff' ? 'active' : ''}`}
+              disabled={modalUser.role === 'staff'}
+            >
+              Staff
+            </button>
+            <button 
+              onClick={() => handleChangeRole(modalUser._id, 'admin')}
+              className={`role-button ${modalUser.role === 'admin' ? 'active' : ''}`}
+              disabled={modalUser.role === 'admin'}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+      </div>
+      <button onClick={closeUserModal} className="close-button">Close</button>
+    </div>
+  </div>
+)}
     </div>
   );
 };
