@@ -12,19 +12,15 @@ const Signup = () => {
       const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, formData, {
         headers: { "Content-Type": "application/json" },
       });
-
+  
       if (res && res.data) {
         localStorage.setItem("token", res.data.token);
-        localStorage.setItem("role", res.data.role); // Assuming role is in the response
+        localStorage.setItem("role", res.data.role); // Still store the role
         
         alert("Signup successful!");
-
-        // Check the role and redirect accordingly
-        if (res.data.role === "student") {
-          window.location.href = "/student-details"; // Redirect to student details page
-        } else {
-          window.location.href = "/auth-Container"; // Redirect to the auth container for other roles
-        }
+        
+        // Since all signups are students, redirect directly to student-details
+        window.location.href = "/student-details";
       } else {
         alert("Unexpected response from server.");
       }
