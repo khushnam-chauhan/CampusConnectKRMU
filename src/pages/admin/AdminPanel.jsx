@@ -171,7 +171,7 @@ const AdminPanel = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    window.location.href = "/login";
+    window.location.href = "/auth-Container";
   };
 
   const [activeSection, setActiveSection] = useState('dashboard');
