@@ -44,9 +44,9 @@ export default function CampusConnectDashboard() {
           <h2 className="welcome-heading">Welcome back</h2>
           <p className="welcome-subtext">Here's what's happening with your academic journey</p>
         </div>
-        <Link to="/internships" className="apply-button1">
+        {/* <Link to="/internships" className="apply-button1">
           Apply for Internship
-        </Link>
+        </Link> */}
       </div>
 
       {/* Dashboard Cards */}
@@ -67,14 +67,7 @@ export default function CampusConnectDashboard() {
           bgColor={"#4ade80"}
           hoverBgColor={"#22c55e"}
         />
-        <DashboardCard
-          to={"/notifications"}
-          title={"New Notifications"}
-          number={"5"}
-          subtitle={"2 job alerts, 3 updates"}
-          bgColor={"#f87171"}
-          hoverBgColor={"#ef4444"}
-        />
+        
         <DashboardCard
           to={"/cv"}
           title={"CV Insights"}

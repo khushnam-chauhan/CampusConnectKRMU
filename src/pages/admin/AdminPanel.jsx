@@ -206,7 +206,7 @@ const api = {
 
 const AdminPanel = () => {
   const dispatch = useDispatch();
-  const [activeSection, setActiveSection] = useState("dashboard");
+  const [activeSection, setActiveSection] = useState("emails"); // Default to emails for staff
   const [userStats, setUserStats] = useState({ totalUsers: 0, activeUsers: 0, pendingApprovals: 0 });
   const [applicationStats, setApplicationStats] = useState({ totalApplications: 0, pendingReview: 0, approved: 0, rejected: 0 });
   const [jobStats, setJobStats] = useState({ totalJobs: 0, activeJobs: 0, expiredJobs: 0 });
@@ -222,30 +222,32 @@ const AdminPanel = () => {
       const userResponse = await axios.get(`${API_BASE_URL}/auth/me`, getAuthConfig());
       setUserRole(userResponse.data.role);
 
-      const usersResponse = await axios.get(`${API_BASE_URL}/admin/stats/users`, getAuthConfig());
-      setUserStats({
-        totalUsers: usersResponse.data.totalUsers || 0,
-        activeUsers: usersResponse.data.activeUsers || 0,
-        pendingApprovals: usersResponse.data.pendingApprovals || 0,
-      });
+      // Only fetch stats if user is admin
+      if (userResponse.data.role === "admin") {
+        const usersResponse = await axios.get(`${API_BASE_URL}/admin/stats/users`, getAuthConfig());
+        setUserStats({
+          totalUsers: usersResponse.data.totalUsers || 0,
+          activeUsers: usersResponse.data.activeUsers || 0,
+          pendingApprovals: usersResponse.data.pendingApprovals || 0,
+        });
 
-      const applicationsResponse = await axios.get(`${API_BASE_URL}/jobs/stats/applications`, getAuthConfig());
-      setApplicationStats({
-        totalApplications: applicationsResponse.data.totalApplications || 0,
-        pendingReview: applicationsResponse.data.pendingReview || 0,
-        approved: applicationsResponse.data.approved || 0,
-        rejected: applicationsResponse.data.rejected || 0,
-      });
+        const applicationsResponse = await axios.get(`${API_BASE_URL}/jobs/stats/applications`, getAuthConfig());
+        setApplicationStats({
+          totalApplications: applicationsResponse.data.totalApplications || 0,
+          pendingReview: applicationsResponse.data.pendingReview || 0,
+          approved: applicationsResponse.data.approved || 0,
+          rejected: applicationsResponse.data.rejected || 0,
+        });
 
-      const jobsResponse = await axios.get(`${API_BASE_URL}/jobs/stats`, getAuthConfig());
-      setJobStats({
-        totalJobs: jobsResponse.data.totalJobs || 0,
-        activeJobs: jobsResponse.data.activeJobs || 0,
-        expiredJobs: jobsResponse.data.expiredJobs || 0,
-      });
+        const jobsResponse = await axios.get(`${API_BASE_URL}/jobs/stats`, getAuthConfig());
+        setJobStats({
+          totalJobs: jobsResponse.data.totalJobs || 0,
+          activeJobs: jobsResponse.data.activeJobs || 0,
+          expiredJobs: jobsResponse.data.expiredJobs || 0,
+        });
+      }
 
-      
-
+      // Fetch training stats for both admin and staff
       try {
         const trainingsResponse = await axios.get(`${API_BASE_URL}/trainings/stats`, getAuthConfig());
         setTrainingStats({
@@ -276,12 +278,26 @@ const AdminPanel = () => {
     fetchUserRoleAndStats();
   }, [dispatch]);
 
+  // When user role is fetched, set default active section
+  useEffect(() => {
+    if (userRole === "staff") {
+      setActiveSection("emails");
+    } else if (userRole === "admin") {
+      setActiveSection("dashboard");
+    }
+  }, [userRole]);
+
   const handleLogout = () => {
     dispatch(logout());
     window.location.href = "/";
   };
 
   const renderDashboard = () => {
+    // Only admins can see the dashboard
+    if (userRole !== "admin") {
+      return <div className="access-denied">Access to dashboard is restricted to administrators.</div>;
+    }
+
     return (
       <div className="admin-dashboard">
         <h2>Admin Dashboard</h2>
@@ -317,16 +333,13 @@ const AdminPanel = () => {
                 <button className="view-more-button" onClick={() => setActiveSection("jobs")}>Manage Jobs</button>
               </div>
               
-              {(userRole === "staff" || userRole === "admin") && (
-                <div className="stats-card">
-                  <h3>Training Management</h3>
-                  <div className="stat-item"><span className="stat-label">Total Trainings:</span><span className="stat-value">{trainingStats.totalTrainings}</span></div>
-                  <div className="stat-item"><span className="stat-label">Upcoming Trainings:</span><span className="stat-value">{trainingStats.upcomingTrainings}</span></div>
-                  <button className="view-more-button" onClick={() => setActiveSection("trainings")}>Manage Trainings</button>
-                </div>
-              )}
+              <div className="stats-card">
+                <h3>Training Management</h3>
+                <div className="stat-item"><span className="stat-label">Total Trainings:</span><span className="stat-value">{trainingStats.totalTrainings}</span></div>
+                <div className="stat-item"><span className="stat-label">Upcoming Trainings:</span><span className="stat-value">{trainingStats.upcomingTrainings}</span></div>
+                <button className="view-more-button" onClick={() => setActiveSection("trainings")}>Manage Trainings</button>
+              </div>
             </div>
-            
           </>
         )}
       </div>
@@ -334,84 +347,122 @@ const AdminPanel = () => {
   };
 
   const renderActiveSection = () => {
-    switch (activeSection) {
-      case "dashboard":
-        return renderDashboard();
-      case "users":
-        return (
-          <AdminUserManagement
-            fetchUsers={api.fetchUsers}
-            updateUser={api.updateUser}
-            deleteUser={api.deleteUser}
-            changeUserRole={api.changeUserRole}
-            createUser={api.createUser}
-          />
-        );
-      case "jobs":
-        return <AdminJobs fetchJobs={api.fetchJobs} updateJob={api.updateJob} deleteJob={api.deleteJob} />;
-      case "applications":
-        return (
-          <AdminApplicationManagement
-            fetchApplications={api.fetchApplications}
-            updateApplicationStatus={api.updateApplicationStatus}
-          />
-        );
-      case "emails":
-        return (
-          <AdminEmailBulk 
-        fetchUserGroups={fetchUserGroups}
-        fetchEmailTemplates={fetchEmailTemplates}
-        saveTemplate={saveTemplate}
-        sendBulkEmail={sendBulkEmail}
-      />
-        );
-      case "trainings":
-        return (
-          <AdminTrainings
-            fetchTrainings={api.fetchTrainings}
-            createTraining={api.createTraining}
-            updateTraining={api.updateTraining}
-            deleteTraining={api.deleteTraining}
-          />
-        );
-      default:
-        return renderDashboard();
+    // Access control for sections based on user role
+    if (userRole === "staff") {
+      // Staff can only access emails and trainings
+      switch (activeSection) {
+        case "emails":
+          return (
+            <AdminEmailBulk 
+              fetchUserGroups={fetchUserGroups}
+              fetchEmailTemplates={fetchEmailTemplates}
+              saveTemplate={saveTemplate}
+              sendBulkEmail={sendBulkEmail}
+            />
+          );
+        case "trainings":
+          return (
+            <AdminTrainings
+              fetchTrainings={api.fetchTrainings}
+              createTraining={api.createTraining}
+              updateTraining={api.updateTraining}
+              deleteTraining={api.deleteTraining}
+            />
+          );
+        default:
+          setActiveSection("emails"); // Redirect to emails if trying to access other sections
+          return null;
+      }
+    } else {
+      // Admin can access all sections
+      switch (activeSection) {
+        case "dashboard":
+          return renderDashboard();
+        case "users":
+          return (
+            <AdminUserManagement
+              fetchUsers={api.fetchUsers}
+              updateUser={api.updateUser}
+              deleteUser={api.deleteUser}
+              changeUserRole={api.changeUserRole}
+              createUser={api.createUser}
+            />
+          );
+        case "jobs":
+          return <AdminJobs fetchJobs={api.fetchJobs} updateJob={api.updateJob} deleteJob={api.deleteJob} />;
+        case "applications":
+          return (
+            <AdminApplicationManagement
+              fetchApplications={api.fetchApplications}
+              updateApplicationStatus={api.updateApplicationStatus}
+            />
+          );
+        case "emails":
+          return (
+            <AdminEmailBulk 
+              fetchUserGroups={fetchUserGroups}
+              fetchEmailTemplates={fetchEmailTemplates}
+              saveTemplate={saveTemplate}
+              sendBulkEmail={sendBulkEmail}
+            />
+          );
+        case "trainings":
+          return (
+            <AdminTrainings
+              fetchTrainings={api.fetchTrainings}
+              createTraining={api.createTraining}
+              updateTraining={api.updateTraining}
+              deleteTraining={api.deleteTraining}
+            />
+          );
+        default:
+          return renderDashboard();
+      }
     }
   };
 
   return (
     <div className="admin-panel-container">
       <div className="admin-sidebar">
-        <div className="admin-logo"><h1>Admin Panel</h1></div>
+        <div className="admin-logo">
+          <h1>{userRole === "staff" ? "Staff Panel" : "Admin Panel"}</h1>
+        </div>
         <nav className="admin-nav">
           <ul>
-            <li className={activeSection === "dashboard" ? "active" : ""}>
-              <button onClick={() => setActiveSection("dashboard")}><span className="nav-icon">📊</span>Dashboard</button>
-            </li>
-            <li className={activeSection === "users" ? "active" : ""}>
-              <button onClick={() => setActiveSection("users")}><span className="nav-icon">👥</span>User Management</button>
-            </li>
-            <li className={activeSection === "jobs" ? "active" : ""}>
-              <button onClick={() => setActiveSection("jobs")}><span className="nav-icon">💼</span>Job Management</button>
-            </li>
-            <li className={activeSection === "applications" ? "active" : ""}>
-              <button onClick={() => setActiveSection("applications")}><span className="nav-icon">📝</span>Applications</button>
-            </li>
+            {/* Only show dashboard and other admin-only sections to admins */}
+            {userRole === "admin" && (
+              <>
+                <li className={activeSection === "dashboard" ? "active" : ""}>
+                  <button onClick={() => setActiveSection("dashboard")}><span className="nav-icon">📊</span>Dashboard</button>
+                </li>
+                <li className={activeSection === "users" ? "active" : ""}>
+                  <button onClick={() => setActiveSection("users")}><span className="nav-icon">👥</span>User Management</button>
+                </li>
+                <li className={activeSection === "jobs" ? "active" : ""}>
+                  <button onClick={() => setActiveSection("jobs")}><span className="nav-icon">💼</span>Job Management</button>
+                </li>
+                <li className={activeSection === "applications" ? "active" : ""}>
+                  <button onClick={() => setActiveSection("applications")}><span className="nav-icon">📝</span>Applications</button>
+                </li>
+              </>
+            )}
+            
+            {/* Show these sections to both admin and staff */}
             <li className={activeSection === "emails" ? "active" : ""}>
               <button onClick={() => setActiveSection("emails")}><span className="nav-icon">📧</span>Bulk Email</button>
             </li>
-            {(userRole === "staff" || userRole === "admin") && (
-              <li className={activeSection === "trainings" ? "active" : ""}>
-                <button onClick={() => setActiveSection("trainings")}><span className="nav-icon">🎓</span>Trainings</button>
-              </li>
-            )}
+            <li className={activeSection === "trainings" ? "active" : ""}>
+              <button onClick={() => setActiveSection("trainings")}><span className="nav-icon">🎓</span>Trainings</button>
+            </li>
           </ul>
         </nav>
         <div className="admin-profile">
           <div className="profile-info">
-            <div className="profile-avatar">A</div>
+            <div className="profile-avatar">
+              {userRole === "admin" ? "A" : "S"}
+            </div>
             <div className="profile-details">
-              <div className="profile-name">Admin User</div>
+              <div className="profile-name">{userRole === "admin" ? "Admin User" : "Staff User"}</div>
               <div className="profile-role">{userRole ? userRole.charAt(0).toUpperCase() + userRole.slice(1) : "Loading..."}</div>
             </div>
           </div>
@@ -421,10 +472,10 @@ const AdminPanel = () => {
       <div className="admin-content">
         <div className="admin-header">
           <div className="breadcrumb">
-            <span>Admin</span><span className="separator">/</span>
+            <span>{userRole === "admin" ? "Admin" : "Staff"}</span>
+            <span className="separator">/</span>
             <span>{activeSection.charAt(0).toUpperCase() + activeSection.slice(1)}</span>
           </div>
-         
         </div>
         <div className="admin-body">{renderActiveSection()}</div>
       </div>

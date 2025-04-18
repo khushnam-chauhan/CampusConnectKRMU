@@ -82,10 +82,9 @@ const AdminEmailBulk = ({ fetchUserGroups, fetchEmailTemplates, saveTemplate, se
 
         // Extract unique roles and schools from user groups
         const roles = [...new Set(validUsers.filter((user) => user.role).map((user) => user.role))]
-        const schoolList = [...new Set(validUsers.filter((user) => user.school).map((user) => user.school))]
 
         setUserRoles(roles)
-        setSchools(schoolList)
+    
         setRecipients(validUsers)
         setFilteredRecipients(validUsers)
 

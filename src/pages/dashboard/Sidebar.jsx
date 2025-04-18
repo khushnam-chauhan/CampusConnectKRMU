@@ -25,7 +25,6 @@ const Sidebar = ({ isOpen, onItemClick }) => {
     { name: "Job Listings", path: "/job-listings" },
     { name: "My Applications", path: "/my-applications" },
     { name: "CDC Trainings", path: "/cdc-trainings" },
-    { name: "Notifications", path: "/notifications" },
     { name: "Profile", path: "/profile" },
     ...(user?.role === "admin"
       ? [{ name: "Admin Dashboard", path: "/admin-mgmnt" }]
