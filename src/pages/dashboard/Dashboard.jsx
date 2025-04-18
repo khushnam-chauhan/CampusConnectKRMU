@@ -35,45 +35,29 @@ export default function CampusConnectDashboard() {
           throw new Error("Failed to fetch trainings");
         }
         const trainingData = await trainingResponse.json();
-        
-        // Filter upcoming trainings and sort by date
         const upcomingTrainings = trainingData
           .filter((training) => new Date(training.date) >= new Date())
           .sort((a, b) => new Date(a.date) - new Date(b.date));
         setTrainings(upcomingTrainings);
-        
-        // Fetch user profile to get area of interest
-        const userResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/profile/me`, {
-          credentials: 'include'
+  
+        // Fetch approved jobs count
+        const token = localStorage.getItem("token");
+        const jobsResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/jobs`, {
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Keep if backend uses cookies
         });
-        
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          setUserInfo(userData);
-          
-          // If user has area of interest, fetch matching jobs
-          if (userData.areaOfInterest) {
-            const jobsResponse = await fetch(`${import.meta.env.VITE_BACKEND_URL}/jobs?profiles=${encodeURIComponent(userData.areaOfInterest)}`, {
-              credentials: 'include'
-            });
-            
-            if (jobsResponse.ok) {
-              const jobsData = await jobsResponse.json();
-              setUserAreaJobs(jobsData);
-            }
-          }
+        if (!jobsResponse.ok) {
+          throw new Error(`Failed to fetch jobs: ${jobsResponse.statusText}`);
         }
-
-        // Fetch all jobs to count approved ones (same as JobListingPage)
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/jobs`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch jobs');
+        const jobsData = await jobsResponse.json();
+        if (!jobsData.success) {
+          throw new Error(jobsData.message || "Failed to fetch jobs");
         }
-        const data = await response.json();
-        const jobsArray = data.data || [];
-        const approvedJobs = jobsArray.filter(job => job.status === 'approved');
-        setTotalJobs(approvedJobs.length);
-
+        setTotalJobs(jobsData.count || 0); // Use count from backend
+  
         // Fetch applications data
         await fetchApplicationsData();
       } catch (err) {
@@ -82,7 +66,7 @@ export default function CampusConnectDashboard() {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
 
