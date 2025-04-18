@@ -3,18 +3,22 @@ import React from "react";
 const UploadsSection = ({ formData, handleChange, API_URL }) => {
   const getImageUrl = (fileData) => {
     if (!fileData) return null;
-
+  
+    // If it's already a URL (containing http), we need to parse and fix it
     if (typeof fileData === "string") {
       if (fileData.startsWith("http")) {
-        return fileData;
+        // Fix the URL if it has a double slash issue
+        return fileData.replace('/api//', '/api/');
       }
-      // Ensure consistent URL construction
-      return `${API_URL}${fileData.startsWith("/") ? "" : "/"}${fileData}`;
+      
+      // For paths like "/uploads/filename"
+      const cleanPath = fileData.replace(/^\//, '');
+      return `${API_URL.replace(/\/$/, '')}/${cleanPath}`;
     }
-
-    // For new uploads (File objects)
+  
     return URL.createObjectURL(fileData);
   };
+  
 
   return (
     <div className="profile-upload-section1">
@@ -24,7 +28,7 @@ const UploadsSection = ({ formData, handleChange, API_URL }) => {
             <img
               src={getImageUrl(formData.profilePhoto)}
               alt="Profile Preview"
-              onError={(e) => console.error("Failed to load profile photo:", e.target.src)} // Debug image loading
+              onError={(e) => console.error("Failed to load profile photo:", e.target.src)}
             />
           ) : (
             <div className="profile-placeholder1">

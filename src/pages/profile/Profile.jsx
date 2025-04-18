@@ -19,10 +19,32 @@ const ProfilePage = () => {
 
   const openResume = () => {
     if (user.resume) {
-      window.open(`${import.meta.env.VITE_BACKEND_URL}${user.resume}`, "_blank");
+      window.open(
+        `${import.meta.env.VITE_BACKEND_URL}${user.resume}`,
+        "_blank"
+      );
     }
   };
+  const getUrl = (path) => {
+    if (!path) return null;
 
+    // If it's already a URL (containing http), we need to parse and fix it
+    if (typeof path === "string") {
+      if (path.startsWith("http")) {
+        // Fix the URL if it has a double slash issue
+        return path.replace("/api//", "/api/");
+      }
+
+      // For paths like "/uploads/filename"
+      const cleanPath = path.replace(/^\//, "");
+      return `${import.meta.env.VITE_BACKEND_URL.replace(
+        /\/$/,
+        ""
+      )}/${cleanPath}`;
+    }
+
+    return URL.createObjectURL(path);
+  };
   const openCertificate = (cert) => {
     if (cert.image) {
       window.open(`${import.meta.env.VITE_BACKEND_URL}${cert.image}`, "_blank");
@@ -43,16 +65,24 @@ const ProfilePage = () => {
       <div className="profile-content">
         <div className="profile-basic-info">
           <div className="info-text">
-            <p><strong>Name:</strong> {user.fullName}</p>
+            <p>
+              <strong>Name:</strong> {user.fullName}
+            </p>
             <p>
               <strong>Course:</strong>{" "}
               {user.education?.masters?.degree ||
                 user.education?.graduation?.degree ||
                 "N/A"}
             </p>
-            <p><strong>College:</strong> {user.school || "N/A"}</p>
-            <p><strong>Contact no.:</strong> {user.mobileNo || "N/A"}</p>
-            <p><strong>Email id:</strong> {user.email || "N/A"}</p>
+            <p>
+              <strong>College:</strong> {user.school || "N/A"}
+            </p>
+            <p>
+              <strong>Contact no.:</strong> {user.mobileNo || "N/A"}
+            </p>
+            <p>
+              <strong>Email id:</strong> {user.email || "N/A"}
+            </p>
             <p>
               <strong>Area of interest:</strong> {user.areaOfInterest || "N/A"}
             </p>
@@ -64,7 +94,10 @@ const ProfilePage = () => {
                   src={
                     user.profilePhoto.startsWith("http")
                       ? user.profilePhoto
-                      : `${import.meta.env.VITE_BACKEND_URL}${user.profilePhoto}`
+                      : `${import.meta.env.VITE_BACKEND_URL.replace(
+                          /\/$/,
+                          ""
+                        )}/${user.profilePhoto.replace(/^\/+/, "")}`
                   }
                   alt="Profile"
                   className="profile-photo1"
@@ -126,7 +159,9 @@ const ProfilePage = () => {
           <div className="section-content education-grid">
             <div className="education-item">
               <h3>10th</h3>
-              <p>Percentage/CGPA: {user.education?.tenth?.percentage || "N/A"}</p>
+              <p>
+                Percentage/CGPA: {user.education?.tenth?.percentage || "N/A"}
+              </p>
               <p>Year: {user.education?.tenth?.passingYear || "N/A"}</p>
             </div>
             <div className="education-item">
@@ -190,7 +225,9 @@ const ProfilePage = () => {
           <div className="section-content experience-cards">
             {user.experience &&
             user.experience.length > 0 &&
-            user.experience.some((exp) => exp.hasExperience || exp.organizationName) ? (
+            user.experience.some(
+              (exp) => exp.hasExperience || exp.organizationName
+            ) ? (
               user.experience
                 .filter((exp) => exp.hasExperience || exp.organizationName)
                 .map((exp, index) => (
@@ -208,8 +245,6 @@ const ProfilePage = () => {
             )}
           </div>
         </div>
-
-        
 
         {/* Hidden tabs content */}
         <div className="hidden-tabs">
@@ -243,20 +278,33 @@ const ProfilePage = () => {
           <div className="tab-content" style={{ display: "none" }}>
             {activeTab === "personal" && (
               <div className="tab-panel">
-                <p><strong>Roll No:</strong> {user.rollNo || "N/A"}</p>
-                <p><strong>Mobile No:</strong> {user.mobileNo || "N/A"}</p>
-                <p><strong>WhatsApp No:</strong> {user.whatsappNo || "N/A"}</p>
-                <p><strong>Mail ID:</strong> {user.email || "N/A"}</p>
-                <p><strong>Father's Name:</strong> {user.fatherName || "N/A"}</p>
                 <p>
-                  <strong>Father's Contact:</strong> {user.fatherNumber || "N/A"}
+                  <strong>Roll No:</strong> {user.rollNo || "N/A"}
+                </p>
+                <p>
+                  <strong>Mobile No:</strong> {user.mobileNo || "N/A"}
+                </p>
+                <p>
+                  <strong>WhatsApp No:</strong> {user.whatsappNo || "N/A"}
+                </p>
+                <p>
+                  <strong>Mail ID:</strong> {user.email || "N/A"}
+                </p>
+                <p>
+                  <strong>Father's Name:</strong> {user.fatherName || "N/A"}
+                </p>
+                <p>
+                  <strong>Father's Contact:</strong>{" "}
+                  {user.fatherNumber || "N/A"}
                 </p>
               </div>
             )}
 
             {activeTab === "education" && (
               <div className="tab-panel">
-                <p><strong>School:</strong> {user.school || "N/A"}</p>
+                <p>
+                  <strong>School:</strong> {user.school || "N/A"}
+                </p>
                 <p>
                   <strong>Year of Passing KRMU:</strong>{" "}
                   {user.education?.masters?.passingYear ||
@@ -318,12 +366,15 @@ const ProfilePage = () => {
                 {user.certifications?.length > 0 ? (
                   user.certifications.map((cert, index) => (
                     <div key={index} className="certification-item">
-                      <p><strong>{cert.name}</strong></p>
+                      <p>
+                        <strong>{cert.name}</strong>
+                      </p>
                       {cert.image && (
                         <img
                           src={
-                            `${import.meta.env.VITE_BACKEND_URL}${cert.image}` ||
-                            "N/A"
+                            `${import.meta.env.VITE_BACKEND_URL}${
+                              cert.image
+                            }` || "N/A"
                           }
                           alt={cert.name}
                           className="certification-image"

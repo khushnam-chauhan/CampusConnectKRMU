@@ -77,10 +77,11 @@ const StudentDetails = () => {
 
         const userData = res.data || {};
         const profilePhotoUrl = userData.profilePhoto
-          ? userData.profilePhoto.startsWith("http")
-            ? userData.profilePhoto
-            : `${API_URL}${userData.profilePhoto.startsWith("/") ? "" : "/"}${userData.profilePhoto}`
-          : null;
+  ? userData.profilePhoto.startsWith("http")
+    ? userData.profilePhoto
+    : `${API_URL.replace(/\/$/, "")}/${userData.profilePhoto.replace(/^\/?api\//, "")}`
+  : null;
+
 
         setFormData((prev) => ({
           ...prev,
