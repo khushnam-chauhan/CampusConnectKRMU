@@ -12,6 +12,7 @@ const DashboardLayout = ({ children }) => {
   const menuItems = [
     { name: "Dashboard", path: "/dashboard" },
     { name: "Home", path: "/" },
+    { name: "CV Insights", path: "/cv" },
     { name: "Job Listings", path: "/job-listings" },
     { name: "My Applications", path: "/my-applications" },
     { name: "CDC Trainings", path: "/cdc-trainings" },

@@ -120,14 +120,7 @@ function App() {
             </ProtectedRoute>
           } 
         />
-        <Route 
-          path="/notifications" 
-          element={
-            <ProtectedRoute allowedRoles={['student']}>
-              <DashboardLayout><Notifications /></DashboardLayout>
-            </ProtectedRoute>
-          } 
-        />
+       
         <Route 
           path="/cv" 
           element={
