@@ -1,0 +1,112 @@
+.cdc-trainings {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 1200px;
+  }
+  
+  .cdc-trainings h2 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+  }
+  
+  .intro-text {
+    color: #4b5563;
+    font-size: 1.1em;
+    margin-bottom: 25px;
+    line-height: 1.6;
+  }
+  
+  .trainings-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .training-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .training-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .training-card h3 {
+    color: #2c3e50;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .description {
+    color: #6b7280;
+    font-size: 0.95em;
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }
+  
+  .details p {
+    margin: 8px 0;
+    color: #4b5563;
+  }
+  
+  .details p strong {
+    color: #374151;
+  }
+  
+  .register-button {
+    display: inline-block;
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 15px;
+  }
+  
+  .register-button:hover {
+    background-color: #2563eb;
+  }
+  
+  .no-trainings {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 20px;
+  }
+  .cdc-trainings .loading {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+  
+  .cdc-trainings .error {
+    text-align: center;
+    color: #ef4444;
+    font-weight: 500;
+  }
+  
+  @media (max-width: 768px) {
+    .cdc-trainings {
+      padding: 15px;
+      margin: 10px;
+    }
+  
+    .trainings-list {
+      grid-template-columns: 1fr;
+    }
+  
+    .training-card {
+      padding: 15px;
+    }
+  }

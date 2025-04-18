@@ -1,0 +1,39 @@
+.verify-email-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+  }
+  
+  .verify-email-card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 28rem;
+  }
+  
+  .verify-email-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .verify-email-message {
+    text-align: center;
+  }
+  
+  .verify-email-message.loading {
+    color: #4b5563;
+  }
+  
+  .verify-email-message.error {
+    color: #ef4444;
+  }
+  
+  .verify-email-message.success {
+    color: #10b981;
+  }

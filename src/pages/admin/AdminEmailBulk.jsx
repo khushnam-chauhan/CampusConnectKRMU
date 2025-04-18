@@ -1,609 +1,580 @@
-import React, { useState, useEffect } from 'react';
-import './AdminBulkEmail.css';
+"use client"
 
-const AdminBulkEmail = ({ fetchUserGroups, fetchEmailTemplates, saveTemplate, sendBulkEmail }) => {
-  const [recipients, setRecipients] = useState({
-    type: 'role',
-    roles: ['student'],
-    departments: [],
-    years: [],
-    customList: []
-  });
-  const [emailContent, setEmailContent] = useState({
-    subject: '',
-    body: '',
-    template: ''
-  });
-  const [attachments, setAttachments] = useState([]);
-  const [previewMode, setPreviewMode] = useState(false);
-  const [sendingStatus, setSendingStatus] = useState(null);
-  const [userGroups, setUserGroups] = useState({
-    roles: [],
-    departments: [],
-    years: []
-  });
-  const [emailTemplates, setEmailTemplates] = useState([]);
-  const [saveTemplateMode, setSaveTemplateMode] = useState(false);
-  const [templateName, setTemplateName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [estimatedRecipientsCount, setEstimatedRecipientsCount] = useState(0);
+import { useState, useEffect } from "react"
+import "./AdminEmailBulk.css"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
+
+const AdminEmailBulk = ({ fetchUserGroups, fetchEmailTemplates, saveTemplate, sendBulkEmail }) => {
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+
+  const [recipients, setRecipients] = useState([])
+  const [selectedRecipients, setSelectedRecipients] = useState([])
+  const [subject, setSubject] = useState("")
+  const [emailContent, setEmailContent] = useState("")
+  const [attachments, setAttachments] = useState([])
+
+  // Template management
+  const [templates, setTemplates] = useState([])
+  const [selectedTemplate, setSelectedTemplate] = useState(null)
+  const [saveAsTemplate, setSaveAsTemplate] = useState(false)
+  const [templateName, setTemplateName] = useState("")
+
+  // Filter options
+  const [userRoles, setUserRoles] = useState([])
+  const [schools, setSchools] = useState([])
+
+  // Search functionality
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filteredRecipients, setFilteredRecipients] = useState([])
+
+  // Selection filters
+  const [selectedRole, setSelectedRole] = useState("all")
+  const [selectedSchool, setSelectedSchool] = useState("all")
+  const [individualMode, setIndividualMode] = useState(false)
+
+  // Progress tracking
+  const [sending, setSending] = useState(false)
+  const [progress, setProgress] = useState(0)
+
+  // Settings
+  const [scheduleSend, setScheduleSend] = useState(false)
+  const [scheduledDateTime, setScheduledDateTime] = useState("")
+  const [trackOpens, setTrackOpens] = useState(true)
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ color: [] }, { background: [] }],
+      ["link", "image"],
+      ["clean"],
+    ],
+  }
 
   useEffect(() => {
-    loadUserGroups();
-    loadEmailTemplates();
-  }, []);
+    const loadInitialData = async () => {
+      setLoading(true)
+      try {
+        // Fetch user groups, roles, and schools
+        const userGroupsData = await fetchUserGroups()
 
-  const loadUserGroups = async () => {
-    setLoading(true);
-    try {
-      const response = await fetchUserGroups();
-      setUserGroups(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load user groups. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
+        // Improved validation of the response structure
+        if (!userGroupsData) {
+          setError("No data received from the server. Please check your API endpoint.")
+          setLoading(false)
+          return
+        }
+
+        // Check if the response has the expected structure
+        if (!userGroupsData.users || !Array.isArray(userGroupsData.users)) {
+          console.error("Invalid user groups data format:", userGroupsData)
+          setError("Received invalid data structure from the server. Expected an object with a 'users' array.")
+          setLoading(false)
+          return
+        }
+
+        // Filter out any invalid user entries
+        const validUsers = userGroupsData.users.filter((user) => user && typeof user === "object")
+
+        // Extract unique roles and schools from user groups
+        const roles = [...new Set(validUsers.filter((user) => user.role).map((user) => user.role))]
+        const schoolList = [...new Set(validUsers.filter((user) => user.school).map((user) => user.school))]
+
+        setUserRoles(roles)
+        setSchools(schoolList)
+        setRecipients(validUsers)
+        setFilteredRecipients(validUsers)
+
+        // Fetch email templates
+        const templatesData = await fetchEmailTemplates()
+
+        // Check if templates data is valid
+        if (templatesData && templatesData.templates) {
+          setTemplates(templatesData.templates)
+        } else {
+          console.warn("No templates found or invalid templates data:", templatesData)
+          setTemplates([])
+        }
+
+        setError(null)
+      } catch (err) {
+        console.error("Error loading email data:", err)
+        setError(`Failed to load email data: ${err.message || "Unknown error"}`)
+      } finally {
+        setLoading(false)
+      }
     }
-  };
 
-  const loadEmailTemplates = async () => {
-    setLoading(true);
-    try {
-      const response = await fetchEmailTemplates();
-      setEmailTemplates(response.data);
-      setError(null);
-    } catch (err) {
-      setError('Failed to load email templates. Please try again.');
-      console.error(err);
-    } finally {
-      setLoading(false);
+    loadInitialData()
+  }, [fetchUserGroups, fetchEmailTemplates])
+
+  // Filter recipients when selection criteria changes or search term changes
+  useEffect(() => {
+    if (!recipients.length) return
+
+    let filtered = [...recipients]
+
+    // Filter by role if not "all"
+    if (selectedRole !== "all") {
+      filtered = filtered.filter((user) => user && user.role === selectedRole)
     }
-  };
 
-  const handleRoleToggle = (role) => {
-    if (recipients.roles.includes(role)) {
-      setRecipients({
-        ...recipients,
-        roles: recipients.roles.filter(r => r !== role)
-      });
-    } else {
-      setRecipients({
-        ...recipients,
-        roles: [...recipients.roles, role]
-      });
+  
+
+    // Filter by search term
+    if (searchTerm.trim() !== "") {
+      const term = searchTerm.toLowerCase()
+      filtered = filtered.filter(
+        (user) =>
+          (user.fullName && user.fullName.toLowerCase().includes(term)) ||
+          (user.email && user.email.toLowerCase().includes(term)) ||
+          (user.rollNo && user.rollNo.toLowerCase().includes(term))
+      )
     }
-  };
 
-  const handleDepartmentToggle = (department) => {
-    if (recipients.departments.includes(department)) {
-      setRecipients({
-        ...recipients,
-        departments: recipients.departments.filter(d => d !== department)
-      });
-    } else {
-      setRecipients({
-        ...recipients,
-        departments: [...recipients.departments, department]
-      });
-    }
-  };
-
-  const handleYearToggle = (year) => {
-    if (recipients.years.includes(year)) {
-      setRecipients({
-        ...recipients,
-        years: recipients.years.filter(y => y !== year)
-      });
-    } else {
-      setRecipients({
-        ...recipients,
-        years: [...recipients.years, year]
-      });
-    }
-  };
-
-  const handleCustomListChange = (e) => {
-    const emails = e.target.value
-      .split(/[,;\n]/)
-      .map(email => email.trim())
-      .filter(email => email.length > 0);
+    setFilteredRecipients(filtered)
     
-    setRecipients({
-      ...recipients,
-      customList: emails
-    });
-  };
+    // Only update selected recipients if not in individual mode
+    if (!individualMode) {
+      setSelectedRecipients(filtered)
+    }
+  }, [selectedRole, selectedSchool, searchTerm, recipients, individualMode])
 
-  const handleRecipientTypeChange = (type) => {
-    setRecipients({
-      ...recipients,
-      type
-    });
-  };
-
-  const handleTemplateChange = (e) => {
-    const templateId = e.target.value;
-    if (!templateId) {
-      return;
+  const handleTemplateSelect = (e) => {
+    const templateId = e.target.value
+    if (templateId === "none") {
+      setSelectedTemplate(null)
+      setSubject("")
+      setEmailContent("")
+      return
     }
 
-    const selectedTemplate = emailTemplates.find(template => template._id === templateId);
-    if (selectedTemplate) {
-      setEmailContent({
-        ...emailContent,
-        template: templateId,
-        subject: selectedTemplate.subject,
-        body: selectedTemplate.body
-      });
+    const template = templates.find((t) => t._id === templateId)
+    if (template) {
+      setSelectedTemplate(template)
+      setSubject(template.subject || "")
+      setEmailContent(template.content || "")
     }
-  };
+  }
+
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files)
+    setAttachments([...attachments, ...files])
+  }
+
+  const removeAttachment = (index) => {
+    const newAttachments = [...attachments]
+    newAttachments.splice(index, 1)
+    setAttachments(newAttachments)
+  }
+
+  const handleRecipientSelection = (userId) => {
+    if (individualMode) {
+      const updatedRecipients = [...selectedRecipients]
+      const index = updatedRecipients.findIndex((r) => r._id === userId)
+
+      if (index >= 0) {
+        updatedRecipients.splice(index, 1)
+      } else {
+        const user = recipients.find((r) => r._id === userId)
+        if (user) {
+          updatedRecipients.push(user)
+        }
+      }
+
+      setSelectedRecipients(updatedRecipients)
+    }
+  }
 
   const handleSaveTemplate = async () => {
     if (!templateName.trim()) {
-      setError('Please enter a template name');
-      return;
+      setError("Please enter a template name")
+      return
     }
 
     try {
-      await saveTemplate({
+      setLoading(true)
+      const templateData = {
         name: templateName,
-        subject: emailContent.subject,
-        body: emailContent.body
-      });
-      
+        subject,
+        content: emailContent,
+      }
+
+      await saveTemplate(templateData)
+
       // Refresh templates list
-      await loadEmailTemplates();
-      
-      setSaveTemplateMode(false);
-      setTemplateName('');
-      setError(null);
+      const templatesData = await fetchEmailTemplates()
+      if (templatesData && templatesData.templates) {
+        setTemplates(templatesData.templates)
+      }
+
+      setSaveAsTemplate(false)
+      setTemplateName("")
+      setSuccess("Template saved successfully")
+
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccess(null)
+      }, 3000)
     } catch (err) {
-      setError('Failed to save template. Please try again.');
-      console.error(err);
+      setError(`Failed to save template: ${err.message || "Unknown error"}`)
+    } finally {
+      setLoading(false)
     }
-  };
-
-  const handleAttachmentAdd = (e) => {
-    const files = Array.from(e.target.files);
-    setAttachments([...attachments, ...files]);
-    e.target.value = null; // Reset input
-  };
-
-  const handleAttachmentRemove = (index) => {
-    setAttachments(attachments.filter((_, i) => i !== index));
-  };
-
-  const togglePreview = () => {
-    setPreviewMode(!previewMode);
-  };
-
-  const validateForm = () => {
-    if (!emailContent.subject.trim()) {
-      setError('Subject is required');
-      return false;
-    }
-
-    if (!emailContent.body.trim()) {
-      setError('Email body is required');
-      return false;
-    }
-
-    if (recipients.type === 'role' && recipients.roles.length === 0) {
-      setError('Please select at least one role');
-      return false;
-    }
-
-    if (recipients.type === 'department' && recipients.departments.length === 0) {
-      setError('Please select at least one department');
-      return false;
-    }
-
-    if (recipients.type === 'year' && recipients.years.length === 0) {
-      setError('Please select at least one year');
-      return false;
-    }
-
-    if (recipients.type === 'custom' && recipients.customList.length === 0) {
-      setError('Please enter at least one email address');
-      return false;
-    }
-
-    return true;
-  };
+  }
 
   const handleSendEmail = async () => {
-    if (!validateForm()) {
-      return;
+    if (selectedRecipients.length === 0) {
+      setError("Please select at least one recipient")
+      return
     }
 
-    if (!window.confirm(`Are you sure you want to send this email to approximately ${estimatedRecipientsCount} recipients?`)) {
-      return;
+    if (!subject.trim()) {
+      setError("Please enter a subject")
+      return
     }
 
-    setSendingStatus('sending');
+    if (!emailContent.trim()) {
+      setError("Please enter email content")
+      return
+    }
+
     try {
-      const formData = new FormData();
-      formData.append('recipientType', recipients.type);
-      
-      if (recipients.type === 'role') {
-        formData.append('roles', JSON.stringify(recipients.roles));
-      } else if (recipients.type === 'department') {
-        formData.append('departments', JSON.stringify(recipients.departments));
-      } else if (recipients.type === 'year') {
-        formData.append('years', JSON.stringify(recipients.years));
-      } else if (recipients.type === 'custom') {
-        formData.append('customList', JSON.stringify(recipients.customList));
+      setSending(true)
+      setProgress(0)
+      setError(null)
+
+      // Create form data for the email
+      const formData = new FormData()
+      formData.append("subject", subject)
+      formData.append("content", emailContent)
+      formData.append("trackOpens", trackOpens)
+
+      // Add recipient IDs
+      const recipientIds = selectedRecipients.map((r) => r._id)
+      formData.append("recipients", JSON.stringify(recipientIds))
+
+      // Add scheduled date if applicable
+      if (scheduleSend && scheduledDateTime) {
+        formData.append("scheduledDateTime", scheduledDateTime)
       }
-      
-      formData.append('subject', emailContent.subject);
-      formData.append('body', emailContent.body);
-      
-      attachments.forEach(file => {
-        formData.append('attachments', file);
-      });
-      
-      await sendBulkEmail(formData);
-      
-      setSendingStatus('success');
-      setError(null);
-      
+
+      // Add attachments
+      attachments.forEach((file) => {
+        formData.append("attachments", file)
+      })
+
+      // Save template if needed
+      if (saveAsTemplate && templateName.trim()) {
+        const templateData = {
+          name: templateName,
+          subject,
+          content: emailContent,
+        }
+        await saveTemplate(templateData)
+      }
+
+      // Simulated progress for UX
+      const progressInterval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) clearInterval(progressInterval)
+          return Math.min(prev + 10, 90)
+        })
+      }, 300)
+
+      // Send the email
+      const result = await sendBulkEmail(formData)
+
+      clearInterval(progressInterval)
+      setProgress(100)
+
+      setSuccess(`Email sent successfully to ${selectedRecipients.length} recipients`)
+
       // Reset form after successful send
       setTimeout(() => {
-        setSendingStatus(null);
-      }, 5000);
+        setSubject("")
+        setEmailContent("")
+        setAttachments([])
+        setSelectedTemplate(null)
+        setSaveAsTemplate(false)
+        setTemplateName("")
+        setScheduleSend(false)
+        setScheduledDateTime("")
+        setSending(false)
+        setProgress(0)
+        setSuccess(null)
+      }, 3000)
     } catch (err) {
-      setSendingStatus('error');
-      setError('Failed to send emails. Please try again.');
-      console.error(err);
+      setSending(false)
+      setProgress(0)
+      setError(`Failed to send email: ${err.message || "Unknown error"}`)
     }
-  };
-
-  const estimateRecipients = async () => {
-    setEstimatedRecipientsCount(
-      recipients.type === 'role' ? recipients.roles.length * 50 :
-      recipients.type === 'department' ? recipients.departments.length * 30 :
-      recipients.type === 'year' ? recipients.years.length * 100 :
-      recipients.customList.length
-    );
-  };
-
-  useEffect(() => {
-    estimateRecipients();
-  }, [recipients]);
-
-  const renderRecipientSelector = () => {
-    switch (recipients.type) {
-      case 'role':
-        return (
-          <div className="recipient-options">
-            <div className="option-group">
-              <h4>Select Roles</h4>
-              <div className="option-list">
-                {userGroups.roles.map(role => (
-                  <div key={role} className="option-item">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={recipients.roles.includes(role)}
-                        onChange={() => handleRoleToggle(role)}
-                      />
-                      {role.charAt(0).toUpperCase() + role.slice(1)}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 'department':
-        return (
-          <div className="recipient-options">
-            <div className="option-group">
-              <h4>Select Departments</h4>
-              <div className="option-list">
-                {userGroups.departments.map(dept => (
-                  <div key={dept} className="option-item">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={recipients.departments.includes(dept)}
-                        onChange={() => handleDepartmentToggle(dept)}
-                      />
-                      {dept}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 'year':
-        return (
-          <div className="recipient-options">
-            <div className="option-group">
-              <h4>Select Years</h4>
-              <div className="option-list">
-                {userGroups.years.map(year => (
-                  <div key={year} className="option-item">
-                    <label>
-                      <input
-                        type="checkbox"
-                        checked={recipients.years.includes(year)}
-                        onChange={() => handleYearToggle(year)}
-                      />
-                      {year}
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        );
-      
-      case 'custom':
-        return (
-          <div className="recipient-options">
-            <div className="option-group">
-              <h4>Enter Email Addresses</h4>
-              <p className="help-text">Enter one email address per line, or separate with commas or semicolons</p>
-              <textarea
-                className="custom-emails"
-                rows={6}
-                placeholder="example1@example.com&#10;example2@example.com"
-                onChange={handleCustomListChange}
-              ></textarea>
-              <div className="email-count">
-                {recipients.customList.length} email address(es) entered
-              </div>
-            </div>
-          </div>
-        );
-      
-      default:
-        return null;
-    }
-  };
+  }
 
   return (
     <div className="admin-bulk-email">
       <h2>Bulk Email System</h2>
-      
+
       {error && <div className="error-message">{error}</div>}
-      
-      {sendingStatus === 'success' && (
-        <div className="success-message">
-          Emails have been sent successfully!
-        </div>
-      )}
-      
-      {sendingStatus === 'error' && (
-        <div className="error-message">
-          Failed to send emails. Please try again.
-        </div>
-      )}
-      
+      {success && <div className="success-message">{success}</div>}
+
       {loading ? (
-        <div className="loading">Loading...</div>
+        <div className="loading">Loading email system...</div>
       ) : (
-        <div className="email-form">
-          <div className="form-section">
-            <h3>1. Select Recipients</h3>
-            <div className="recipient-type-selector">
-              <div className="selector-option">
-                <label>
-                  <input
-                    type="radio"
-                    name="recipientType"
-                    value="role"
-                    checked={recipients.type === 'role'}
-                    onChange={() => handleRecipientTypeChange('role')}
-                  />
-                  By Role
-                </label>
+        <div className="email-container">
+          <div className="email-sidebar">
+            <div className="recipient-filters">
+              <h3>Select Recipients</h3>
+
+              <div className="search-bar">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search by name, email or roll number..."
+                  className="search-input"
+                />
               </div>
-              <div className="selector-option">
-                <label>
-                  <input
-                    type="radio"
-                    name="recipientType"
-                    value="department"
-                    checked={recipients.type === 'department'}
-                    onChange={() => handleRecipientTypeChange('department')}
-                  />
-                  By Department
-                </label>
-              </div>
-              <div className="selector-option">
-                <label>
-                  <input
-                    type="radio"
-                    name="recipientType"
-                    value="year"
-                    checked={recipients.type === 'year'}
-                    onChange={() => handleRecipientTypeChange('year')}
-                  />
-                  By Year
-                </label>
-              </div>
-              <div className="selector-option">
-                <label>
-                  <input
-                    type="radio"
-                    name="recipientType"
-                    value="custom"
-                    checked={recipients.type === 'custom'}
-                    onChange={() => handleRecipientTypeChange('custom')}
-                  />
-                  Custom List
-                </label>
-              </div>
-            </div>
-            
-            {renderRecipientSelector()}
-            
-            <div className="recipient-estimate">
-              Estimated number of recipients: <strong>{estimatedRecipientsCount}</strong>
-            </div>
-          </div>
-          
-          <div className="form-section">
-            <h3>2. Compose Email</h3>
-            
-            <div className="template-selector">
-              <label>
-                Use Template:
-                <select 
-                  value={emailContent.template} 
-                  onChange={handleTemplateChange}
+
+              <div className="filter-group">
+                <label>Filter by Role:</label>
+                <select
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  disabled={individualMode}
                 >
-                  <option value="">-- Select a template --</option>
-                  {emailTemplates.map(template => (
-                    <option key={template._id} value={template._id}>
-                      {template.name}
+                  <option value="all">All Roles</option>
+                  {userRoles.map((role, index) => (
+                    <option key={index} value={role}>
+                      {role}
                     </option>
                   ))}
                 </select>
-              </label>
-              
-              <button 
-                type="button" 
-                className="secondary-button"
-                onClick={() => setSaveTemplateMode(!saveTemplateMode)}
-              >
-                {saveTemplateMode ? 'Cancel Save' : 'Save as Template'}
-              </button>
+              </div>
+
+             
+              <div className="filter-toggle">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={individualMode}
+                    onChange={() => {
+                      setIndividualMode(!individualMode)
+                      if (!individualMode) {
+                        setSelectedRole("all")
+                        setSelectedSchool("all")
+                        setSelectedRecipients([])
+                      }
+                    }}
+                  />
+                  Select Individual Recipients
+                </label>
+              </div>
             </div>
-            
-            {saveTemplateMode && (
-              <div className="save-template-form">
-                <input
-                  type="text"
-                  placeholder="Template Name"
-                  value={templateName}
-                  onChange={(e) => setTemplateName(e.target.value)}
-                />
-                <button 
-                  type="button" 
-                  className="primary-button"
-                  onClick={handleSaveTemplate}
-                >
-                  Save Template
-                </button>
-              </div>
-            )}
-            
-            <div className="email-composer">
-              <div className="form-group">
-                <label htmlFor="email-subject">Subject:</label>
-                <input
-                  id="email-subject"
-                  type="text"
-                  value={emailContent.subject}
-                  onChange={(e) => setEmailContent({...emailContent, subject: e.target.value})}
-                  placeholder="Enter email subject"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="email-body">Email Body:</label>
-                <textarea
-                  id="email-body"
-                  rows={10}
-                  value={emailContent.body}
-                  onChange={(e) => setEmailContent({...emailContent, body: e.target.value})}
-                  placeholder="Enter email content"
-                ></textarea>
-                <p className="help-text">
-                  Use markdown for formatting. You can use variables like {'{firstName}'}, {'{lastName}'}, etc.
-                </p>
-              </div>
-              
-              <div className="attachments-section">
-                <h4>Attachments</h4>
-                <div className="attachment-list">
-                  {attachments.map((file, index) => (
-                    <div key={index} className="attachment-item">
-                      <span className="file-name">{file.name}</span>
-                      <span className="file-size">({(file.size / 1024).toFixed(2)} KB)</span>
-                      <button 
-                        type="button" 
-                        className="remove-button"
-                        onClick={() => handleAttachmentRemove(index)}
-                      >
-                        ✕
-                      </button>
+
+            <div className="recipient-list">
+              <h4>Recipients ({selectedRecipients.length})</h4>
+              {individualMode ? (
+                <div className="individual-recipients">
+                  {filteredRecipients.map((user) => (
+                    <div
+                      key={user._id}
+                      className={`recipient-item ${selectedRecipients.some((r) => r._id === user._id) ? "selected" : ""}`}
+                      onClick={() => handleRecipientSelection(user._id)}
+                    >
+                      <div className="recipient-info">
+                        <div className="recipient-name">{user.fullName}</div>
+                        <div className="recipient-email">{user.email}</div>
+                        <div className="recipient-meta">
+                          <span className="role">{user.role}</span>
+                          {user.school && <span className="school">{user.school}</span>}
+                          {user.rollNo && <span className="roll-no">#{user.rollNo}</span>}
+                        </div>
+                      </div>
+                      <div className="recipient-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={selectedRecipients.some((r) => r._id === user._id)}
+                          onChange={() => {}}
+                        />
+                      </div>
                     </div>
                   ))}
-                  
-                  {attachments.length === 0 && (
-                    <p className="no-attachments">No attachments added</p>
-                  )}
                 </div>
-                
-                <div className="attachment-controls">
-                  <label className="file-input-button">
-                    Add Attachment
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleAttachmentAdd}
-                      style={{ display: 'none' }}
-                    />
-                  </label>
-                  <p className="help-text">Max file size: 5 MB</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="form-actions">
-            <button 
-              type="button" 
-              className="secondary-button preview-button"
-              onClick={togglePreview}
-            >
-              {previewMode ? 'Edit Email' : 'Preview Email'}
-            </button>
-            
-            <button 
-              type="button" 
-              className="primary-button send-button"
-              onClick={handleSendEmail}
-              disabled={sendingStatus === 'sending'}
-            >
-              {sendingStatus === 'sending' ? 'Sending...' : 'Send Email'}
-            </button>
-          </div>
-          
-          {previewMode && (
-            <div className="email-preview">
-              <h3>Email Preview</h3>
-              <div className="preview-subject">
-                <strong>Subject:</strong> {emailContent.subject}
-              </div>
-              <div className="preview-body">
-                <div dangerouslySetInnerHTML={{ __html: emailContent.body }}></div>
-              </div>
-              {attachments.length > 0 && (
-                <div className="preview-attachments">
-                  <strong>Attachments:</strong>
-                  <ul>
-                    {attachments.map((file, index) => (
-                      <li key={index}>{file.name} ({(file.size / 1024).toFixed(2)} KB)</li>
+              ) : (
+                <div className="group-recipients">
+                  <div className="recipient-summary">
+                    <div>
+                      Total Recipients: <strong>{selectedRecipients.length}</strong>
+                    </div>
+                    {selectedRole !== "all" && (
+                      <div>
+                        Role: <strong>{selectedRole}</strong>
+                      </div>
+                    )}
+                    {selectedSchool !== "all" && (
+                      <div>
+                        School: <strong>{selectedSchool}</strong>
+                      </div>
+                    )}
+                    {searchTerm && (
+                      <div>
+                        Search: <strong>{searchTerm}</strong>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="recipient-preview">
+                    {selectedRecipients.slice(0, 5).map((user) => (
+                      <div key={user._id} className="recipient-item">
+                        <div className="recipient-info">
+                          <div className="recipient-name">{user.fullName}</div>
+                          <div className="recipient-email">{user.email}</div>
+                          {user.rollNo && <div className="recipient-roll">#{user.rollNo}</div>}
+                        </div>
+                      </div>
                     ))}
-                  </ul>
+                    {selectedRecipients.length > 5 && (
+                      <div className="more-recipients">+ {selectedRecipients.length - 5} more recipients</div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
-          )}
+          </div>
+
+          <div className="email-composer">
+            <div className="template-selector">
+              <label>Choose Template:</label>
+              <select onChange={handleTemplateSelect} value={selectedTemplate?._id || "none"}>
+                <option value="none">No Template</option>
+                {templates.map((template) => (
+                  <option key={template._id} value={template._id}>
+                    {template.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="email-subject">
+              <label>Subject:</label>
+              <input
+                type="text"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Enter email subject"
+              />
+            </div>
+
+            <div className="email-content">
+              <label>Email Content:</label>
+              <ReactQuill
+                value={emailContent}
+                onChange={setEmailContent}
+                modules={modules}
+                placeholder="Compose your email..."
+              />
+            </div>
+
+            <div className="email-attachments">
+              <label>Attachments:</label>
+              <input type="file" multiple onChange={handleFileChange} className="attachment-input" />
+
+              {attachments.length > 0 && (
+                <div className="attachment-list">
+                  {attachments.map((file, index) => (
+                    <div key={index} className="attachment-item">
+                      <span>{file.name}</span>
+                      <button type="button" onClick={() => removeAttachment(index)} className="remove-attachment">
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="email-options">
+              <div className="option-group">
+                <label>
+                  <input type="checkbox" checked={saveAsTemplate} onChange={() => setSaveAsTemplate(!saveAsTemplate)} />
+                  Save as Template
+                </label>
+
+                {saveAsTemplate && (
+                  <input
+                    type="text"
+                    value={templateName}
+                    onChange={(e) => setTemplateName(e.target.value)}
+                    placeholder="Template Name"
+                    className="template-name-input"
+                  />
+                )}
+              </div>
+
+              <div className="option-group">
+                <label>
+                  <input type="checkbox" checked={scheduleSend} onChange={() => setScheduleSend(!scheduleSend)} />
+                  Schedule Send
+                </label>
+
+                {scheduleSend && (
+                  <input
+                    type="datetime-local"
+                    value={scheduledDateTime}
+                    onChange={(e) => setScheduledDateTime(e.target.value)}
+                    className="schedule-datetime-input"
+                  />
+                )}
+              </div>
+
+              <div className="option-group">
+                <label>
+                  <input type="checkbox" checked={trackOpens} onChange={() => setTrackOpens(!trackOpens)} />
+                  Track Email Opens
+                </label>
+              </div>
+            </div>
+
+            <div className="email-actions">
+              {saveAsTemplate && (
+                <button
+                  type="button"
+                  onClick={handleSaveTemplate}
+                  className="save-template-button"
+                  disabled={sending || !templateName.trim()}
+                >
+                  Save Template
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSendEmail}
+                className="send-email-button"
+                disabled={sending || selectedRecipients.length === 0 || !subject.trim() || !emailContent.trim()}
+              >
+                {sending ? "Sending..." : scheduleSend ? "Schedule Email" : "Send Email"}
+              </button>
+            </div>
+
+            {sending && (
+              <div className="sending-progress">
+                <div className="progress-bar">
+                  <div className="progress" style={{ width: `${progress}%` }}></div>
+                </div>
+                <div className="progress-text">{progress}% Complete</div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default AdminBulkEmail;
+export default AdminEmailBulk

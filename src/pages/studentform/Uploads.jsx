@@ -18,7 +18,7 @@ const UploadsSection = ({ formData, handleChange, API_URL }) => {
 
   return (
     <div className="profile-upload-section1">
-      <div className="profile-photo-container1">
+      <div className="profile-photo-container11">
         <div className="profile-photo-preview1">
           {formData.profilePhoto ? (
             <img
@@ -49,7 +49,7 @@ const UploadsSection = ({ formData, handleChange, API_URL }) => {
         />
       </div>
 
-      <div className="resume-upload-container1">
+      <div className="resume-upload-container11">
         <div className="resume-preview1">
           {formData.resume ? (
             <div className="resume-uploaded1">

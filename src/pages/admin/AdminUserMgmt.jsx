@@ -73,21 +73,19 @@ const AdminUserManagement = ({ fetchUsers, updateUser, deleteUser, changeUserRol
   };
 
   const handleUpdateUser = async (e) => {
-    e.preventDefault();
-    try {
-      await updateUser(editingUserId, userForm);
-      setUsers(users.map(user => 
-        user._id === editingUserId ? { ...user, ...userForm } : user
-      ));
-      setShowEditUser(false);
-      setEditingUserId(null);
-      setUserForm({ fullName: '', email: '', password: '', mobileNo: '', role: 'student', status: 'active', rollNo: '' });
-      setError(null);
+    e.preventDefault()
+    try {  
+      await updateUser(editingUserId, userForm)
+      setUsers(users.map((user) => (user._id === editingUserId ? { ...user, ...userForm } : user)))
+      setShowEditUser(false)
+      setEditingUserId(null)
+      setUserForm({ fullName: "", email: "", password: "", mobileNo: "", role: "student", status: "active", rollNo: "" })
+      setError(null)
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to update user');
-      console.error('Error updating user:', err);
+      setError(err.response?.data?.message || "Failed to update user")
+      console.error("Error updating user:", err)
     }
-  };
+  }
 
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {

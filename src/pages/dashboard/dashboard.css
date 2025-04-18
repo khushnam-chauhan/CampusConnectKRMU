@@ -170,7 +170,7 @@
     margin-bottom: 16px;
   }
   
-  .training-item {
+  .training-item1 {
     display: flex;
     align-items: flex-start;
     gap: 16px;
@@ -207,7 +207,17 @@
   .training-date {
     color: #666;
   }
+  .dashboard-container .loading {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
   
+  .dashboard-container .error {
+    text-align: center;
+    color: #ef4444;
+    font-weight: 500;
+  }
   /* Responsive styles */
   @media (min-width: 768px) {
     .welcome-section {

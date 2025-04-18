@@ -10,6 +10,8 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [resendEmailLoading, setResendEmailLoading] = useState(false);
+  const [resendEmailSuccess, setResendEmailSuccess] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,73 +21,118 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
-      // Login request
       const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, formData, {
         headers: { "Content-Type": "application/json" },
       });
 
       if (res && res.data) {
-        // Store token
-        const token = res.data.token;
+        const { token, user } = res.data;
         localStorage.setItem("token", token);
-        
-        // Set default axios header for future requests
+        localStorage.setItem("role", user.role);
         axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-        // Fetch user profile after login
-        const profileRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/profile/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (profileRes && profileRes.data) {
-          const user = profileRes.data;
-          
-          
-          // Store user role in localStorage
-          localStorage.setItem("role", user.role);
-          
-          // Update Redux state by dispatching fetchUser action
-          dispatch(fetchUser());
-          
-          // Redirect based on role
-          if (user.role === "admin" || user.role === "staff") {
-            console.log("Redirecting to admin panel");
-            navigate("/admin-panel");
-          } else if (user.role === "student") {
-            // Always redirect students to student-details page
-            navigate("/student-details");
-          } else {
-            navigate("/dashboard"); // Fallback redirect
-          }
+        dispatch(fetchUser());
+        if (user.role === "admin" || user.role === "staff") {
+          navigate("/admin-panel");
+        } else if (user.role === "student") {
+          navigate("/student-details");
+        } else {
+          navigate("/dashboard");
         }
       }
     } catch (error) {
       console.error("Login Error:", error.response || error.message);
+      console.error("Error details:", error.response?.data); 
       setError(error.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleResendVerificationEmail = async () => {
+    if (!formData.email) {
+      setError("Please enter your email address first.");
+      return;
+    }
+
+    setResendEmailLoading(true);
+    setResendEmailSuccess(null);
+    setError(null);
+
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/resend-verification`, 
+        { email: formData.email },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      if (res && res.data) {
+        setResendEmailSuccess(res.data.message);
+      }
+    } catch (error) {
+      console.error("Resend Verification Error:", error.response || error.message);
+      setError(error.response?.data?.message || "Failed to resend verification email. Please try again.");
+    } finally {
+      setResendEmailLoading(false);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit}>
-      <h1>Sign In</h1>
-      <div className="social-container">
-        <a href="#" className="social"><i className="fab fa-google"></i></a>
-        <a href="#" className="social"><i className="fab fa-facebook-f"></i></a>
-        <a href="#" className="social"><i className="fab fa-github"></i></a>
+    <div className="login-container">
+      <div className="login-card">
+        <h1 className="login-title">Sign In</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          <div className="form-group">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="form-input"
+            />
+          </div>
+          
+          {error && (
+            <div className="login-error">{error}</div>
+          )}
+          {resendEmailSuccess && (
+            <div className="login-success">{resendEmailSuccess}</div>
+          )}
+          <button
+            type="submit"
+            disabled={loading}
+            className={`login-button ${loading ? 'disabled' : ''}`}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </button>
+          {error && error.includes("verify your email") && (
+            <button 
+              type="button" 
+              onClick={handleResendVerificationEmail}
+              disabled={resendEmailLoading}
+              className="resend-button"
+            >
+              {resendEmailLoading ? "Sending..." : "Resend Verification Email"}
+            </button>
+          )}
+        </form>
       </div>
-      <span>or use your account</span>
-      <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-      <input type="password" name="password" placeholder="Password" value={formData.password} onChange={handleChange} required />
-      <a href="#">Forgot your password?</a>
-      {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-      <button type="submit" disabled={loading}>
-        {loading ? 'Signing In...' : 'Sign In'}
-      </button>
-    </form>
+    </div>
   );
 };
 
