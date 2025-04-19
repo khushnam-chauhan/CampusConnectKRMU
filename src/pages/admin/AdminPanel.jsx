@@ -201,43 +201,6 @@ const api = {
       console.error("Error deleting training:", error);
       throw error;
     }
-  },
-  // Add Placed Students API functions
-  fetchPlacedStudents: async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/placed-students`, getAuthConfig());
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching placed students:", error);
-      throw error;
-    }
-  },
-  createPlacedStudent: async (studentData) => {
-    try {
-      const response = await axios.post(`${API_BASE_URL}/admin/placed-students`, studentData, getAuthConfig());
-      return response.data;
-    } catch (error) {
-      console.error("Error creating placed student:", error);
-      throw error;
-    }
-  },
-  updatePlacedStudent: async (studentId, studentData) => {
-    try {
-      const response = await axios.put(`${API_BASE_URL}/admin/placed-students/${studentId}`, studentData, getAuthConfig());
-      return response.data;
-    } catch (error) {
-      console.error("Error updating placed student:", error);
-      throw error;
-    }
-  },
-  deletePlacedStudent: async (studentId) => {
-    try {
-      const response = await axios.delete(`${API_BASE_URL}/admin/placed-students/${studentId}`, getAuthConfig());
-      return response.data;
-    } catch (error) {
-      console.error("Error deleting placed student:", error);
-      throw error;
-    }
   }
 };
 
@@ -249,7 +212,6 @@ const AdminPanel = () => {
   const [jobStats, setJobStats] = useState({ totalJobs: 0, activeJobs: 0, expiredJobs: 0 });
   const [emailStats, setEmailStats] = useState({ emailsSent: 0, lastCampaign: "-", openRate: "-" });
   const [trainingStats, setTrainingStats] = useState({ totalTrainings: 0, upcomingTrainings: 0 });
-  const [placedStats, setPlacedStats] = useState({ totalPlaced: 0 }); // Added placed students stats
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -283,16 +245,6 @@ const AdminPanel = () => {
           activeJobs: jobsResponse.data.activeJobs || 0,
           expiredJobs: jobsResponse.data.expiredJobs || 0,
         });
-        
-        // Fetch placed students stats
-        try {
-          const placedResponse = await axios.get(`${API_BASE_URL}/placed-students/stats`, getAuthConfig());
-          setPlacedStats({
-            totalPlaced: placedResponse.data.totalPlaced || 0,
-          });
-        } catch (placedErr) {
-          console.warn("Placed students stats not available:", placedErr.message);
-        }
       }
 
       // Fetch training stats for both admin and staff
@@ -380,19 +332,11 @@ const AdminPanel = () => {
                 <div className="stat-item"><span className="stat-label">Expired Jobs:</span><span className="stat-value">{jobStats.expiredJobs}</span></div>
                 <button className="view-more-button" onClick={() => setActiveSection("jobs")}>Manage Jobs</button>
               </div>
-              
               <div className="stats-card">
                 <h3>Training Management</h3>
                 <div className="stat-item"><span className="stat-label">Total Trainings:</span><span className="stat-value">{trainingStats.totalTrainings}</span></div>
                 <div className="stat-item"><span className="stat-label">Upcoming Trainings:</span><span className="stat-value">{trainingStats.upcomingTrainings}</span></div>
                 <button className="view-more-button" onClick={() => setActiveSection("trainings")}>Manage Trainings</button>
-              </div>
-              
-              {/* New Placed Students Stats Card */}
-              <div className="stats-card">
-                <h3>Placed Students</h3>
-                <div className="stat-item"><span className="stat-label">Total Placed:</span><span className="stat-value">{placedStats.totalPlaced}</span></div>
-                <button className="view-more-button" onClick={() => setActiveSection("placed")}>Manage Placed Students</button>
               </div>
             </div>
           </>
@@ -404,7 +348,7 @@ const AdminPanel = () => {
   const renderActiveSection = () => {
     // Access control for sections based on user role
     if (userRole === "staff") {
-      // Staff can only access emails, trainings, and placed students
+      // Staff can only access emails and trainings
       switch (activeSection) {
         case "emails":
           return (
@@ -422,15 +366,6 @@ const AdminPanel = () => {
               createTraining={api.createTraining}
               updateTraining={api.updateTraining}
               deleteTraining={api.deleteTraining}
-            />
-          );
-        case "placed":
-          return (
-            <AdminPlaced
-              fetchPlacedStudents={api.fetchPlacedStudents}
-              createPlacedStudent={api.createPlacedStudent}
-              updatePlacedStudent={api.updatePlacedStudent}
-              deletePlacedStudent={api.deletePlacedStudent}
             />
           );
         default:
@@ -479,15 +414,6 @@ const AdminPanel = () => {
               deleteTraining={api.deleteTraining}
             />
           );
-        case "placed":
-          return (
-            <AdminPlaced
-              fetchPlacedStudents={api.fetchPlacedStudents}
-              createPlacedStudent={api.createPlacedStudent}
-              updatePlacedStudent={api.updatePlacedStudent}
-              deletePlacedStudent={api.deletePlacedStudent}
-            />
-          );
         default:
           return renderDashboard();
       }
@@ -527,8 +453,6 @@ const AdminPanel = () => {
             <li className={activeSection === "trainings" ? "active" : ""}>
               <button onClick={() => setActiveSection("trainings")}><span className="nav-icon">🎓</span>Trainings</button>
             </li>
-            
-            
           </ul>
         </nav>
         <div className="admin-profile">

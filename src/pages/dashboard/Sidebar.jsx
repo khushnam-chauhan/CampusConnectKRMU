@@ -58,21 +58,20 @@ const Sidebar = ({ isOpen, onItemClick }) => {
                 <p>Loading...</p>
               ) : (
                 <>
-                  {user?.profilePhoto && (
-                    <div className="profile-pic">
-                      <img
-                        className="profile-img"
-                        src={
-                          user.profilePhoto.startsWith("http")
+                  <div className="profile-pic">
+                    <img
+                      className="profile-img"
+                      src={
+                        user?.profilePhoto
+                          ? user.profilePhoto.startsWith("http")
                             ? user.profilePhoto
-                            : `${import.meta.env.VITE_BACKEND_URL}${
-                                user.profilePhoto
-                              }`
-                        }
-                        alt="Profile"
-                      />
-                    </div>
-                  )}
+                            : `${import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '')}/${user.profilePhoto.replace(/^\/+/, '')}`
+                          : "/default-avatar.png"
+                      }
+                      alt="Profile"
+                      onError={(e) => (e.target.src = "/default-avatar.png")}
+                    />
+                  </div>
                   <p>Hi, {user?.fullName || "User"} 👋</p>
                 </>
               )}
