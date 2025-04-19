@@ -16,7 +16,6 @@ const DashboardLayout = ({ children }) => {
     { name: "Job Listings", path: "/job-listings" },
     { name: "My Applications", path: "/my-applications" },
     { name: "CDC Trainings", path: "/cdc-trainings" },
-    { name: "Notifications", path: "/notifications" },
     { name: "Profile", path: "/profile" },
     { name: "Admin Dashboard", path: "/admin-mgmnt" },
     { name: "Applications", path: "/admin-applications" }, 

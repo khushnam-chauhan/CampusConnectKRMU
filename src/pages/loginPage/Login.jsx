@@ -44,7 +44,6 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Login Error:", error.response || error.message);
-      console.error("Error details:", error.response?.data); 
       setError(error.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
@@ -68,70 +67,45 @@ const Login = () => {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      if (res && res.data) {
-        setResendEmailSuccess(res.data.message);
-      }
-    } catch (error) {
-      console.error("Resend Verification Error:", error.response || error.message);
-      setError(error.response?.data?.message || "Failed to resend verification email. Please try again.");
+      setResendEmailSuccess(res.data.message);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to resend verification email.");
     } finally {
       setResendEmailLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h1 className="login-title">Sign In</h1>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="form-input"
-            />
-          </div>
-          
-          {error && (
-            <div className="login-error">{error}</div>
-          )}
-          {resendEmailSuccess && (
-            <div className="login-success">{resendEmailSuccess}</div>
-          )}
-          <button
-            type="submit"
-            disabled={loading}
-            className={`login-button ${loading ? 'disabled' : ''}`}
-          >
-            {loading ? "Signing In..." : "Sign In"}
-          </button>
-          {error && error.includes("verify your email") && (
-            <button 
-              type="button" 
-              onClick={handleResendVerificationEmail}
-              disabled={resendEmailLoading}
-              className="resend-button"
-            >
-              {resendEmailLoading ? "Sending..." : "Resend Verification Email"}
-            </button>
-          )}
-        </form>
-      </div>
+    <div className="form-content">
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="Email"
+        />
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Password"
+        />
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+      {error && <div className="error-message">{error}</div>}
+      <button
+        className="ghost"
+        onClick={handleResendVerificationEmail}
+        disabled={resendEmailLoading}
+      >
+        {resendEmailLoading ? "Sending..." : "Resend Verification Email"}
+      </button>
+      {resendEmailSuccess && <div className="success-message">{resendEmailSuccess}</div>}
     </div>
   );
 };

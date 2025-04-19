@@ -19,7 +19,6 @@ const LandingPage = () => {
       <Features />
       <HiringSection/>
       <FAQ/>
-      <Placed/>
       <Footer />
     </>
   );

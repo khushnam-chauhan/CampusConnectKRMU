@@ -1,23 +1,86 @@
-.features{
+.features {
+    position: relative;
     display: flex;
     flex-direction: column;
-    max-width:100vw ;
-
-}
-
-.feature-heading{
+    align-items: center;
+    max-width: 1200px; /* 👈 Max width added */
+    margin: 0 auto;
+    padding: 3rem 2rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* 👈 Soft black overlay */
+    z-index: 1;
+    border-radius: 16px;
+  }
+  
+  .content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+  }
+  
+  /* Heading styles */
+  .feature-heading {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: .7rem;
+    gap: 0.7rem;
     margin-bottom: 2rem;
-}
-.f-heading{
-    font-size: 40px;
-}
-.cards {
-    display: grid;
-    grid-template-columns: repeat(3,1fr); 
-    margin-bottom: 2rem;
+    text-align: center;
   }
+  
+  .f-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+  }
+  
+  .f-para {
+    font-size: 1.1rem;
+    color: #ddd;
+  }
+  
+  /* Cards Grid */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    z-index: 2;
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Responsive Design */
+  @media screen and (max-width: 1024px) {
+    .cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .features {
+      padding: 2rem 1rem;
+    }
+  
+    .f-heading {
+      font-size: 2rem;
+    }
+  
+    .cards {
+      grid-template-columns: 1fr;
+    }
+  }
+  

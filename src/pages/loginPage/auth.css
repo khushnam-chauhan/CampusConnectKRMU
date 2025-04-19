@@ -11,7 +11,7 @@
   align-items: center;
   flex-direction: column;
   font-family: "Montserrat", sans-serif;
-  height: calc(100vh-60px);
+  height: 100vh;
   margin: 0;
 }
 
@@ -22,8 +22,8 @@
     0 10px 10px rgba(0, 0, 0, 0.22);
   position: relative;
   overflow: hidden;
-  width: 788px;
-  max-width: 100%;
+  width: 100%;
+  max-width: 900px;
   min-height: 480px;
 }
 
@@ -42,11 +42,6 @@
   visibility: visible;
   opacity: 1;
 }
-.sign-in-container{
-  display: flex;
-  margin-top: 2rem;
-}
-
 
 .auth-container .sign-up-container {
   left: 0;
@@ -55,9 +50,6 @@
   opacity: 0;
 }
 
-.sign-up-container{
-  margin-top: 2rem;
-}
 .auth-container .container.right-panel-active .sign-in-container {
   transform: translateX(100%);
   opacity: 0;
@@ -83,13 +75,16 @@
   }
 }
 
-/* Input & Button Styling */
+.auth-container input,
+.auth-container button {
+  width: 100%;
+}
+
 .auth-container input {
   background-color: #eee;
   border: none;
   padding: 12px 15px;
   margin: 8px 0;
-  width: 100%;
   border-radius: 5px;
 }
 
@@ -120,7 +115,6 @@
   transform: scale(0.95);
 }
 
-/* Overlay */
 .auth-container .overlay-container {
   position: absolute;
   top: 0;
@@ -185,19 +179,73 @@
 .auth-container .container.right-panel-active .overlay-right {
   transform: translateX(20%);
 }
-
-/* Social Login Styling */
-.auth-container .social-container {
-  margin: 20px 0;
-}
-
-.auth-container .social-container a {
-  border: 1px solid #dddddd;
-  border-radius: 50%;
-  display: inline-flex;
+.auth-container .form-container {
+  display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0 5px;
-  height: 40px;
-  width: 40px;
+}
+
+.auth-container .form-container button,
+.auth-container .form-container a {
+  width: 100%;
+}
+
+.auth-container .form-container a {
+  font-size: 14px;
+  color: #731fd9;
+  text-align: center;
+  margin-top: 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.auth-container .form-container a:hover {
+  text-decoration: underline;
+}
+
+.auth-container .form-container input {
+  margin: 8px 0;
+}
+
+.auth-container .overlay-container {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+  transition: transform 0.6s ease-in-out;
+  z-index: 100;
+}
+
+.auth-container .container.right-panel-active .overlay-container {
+  transform: translateX(-100%);
+}
+
+@media (max-width: 768px) {
+  .auth-container .container {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+  }
+
+  .auth-container .form-container {
+    width: 100%;
+    margin: 0;
+  }
+
+  .auth-container .overlay-container {
+    width: 100%;
+    left: 0;
+  }
+
+  .auth-container .overlay {
+    width: 100%;
+    left: -100%;
+  }
+
+  .auth-container .container.right-panel-active .overlay {
+    transform: translateX(50%);
+  }
 }

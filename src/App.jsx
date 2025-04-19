@@ -18,6 +18,7 @@ import ProtectedRoute from './redux/ProtectedRoute';
 import MyApplications from "./pages/job-listings/Applications";
 import VerifyEmail from "./pages/loginPage/VerifyEmail";
 import CVInsightsPage from "./pages/job-listings/CV";
+import About from "./components/About";
 
 function App() {
   const dispatch = useDispatch();
@@ -111,6 +112,7 @@ function App() {
           } 
         />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/about" element={<About />} />
         <Route 
           path="/job-listings" 
           element={

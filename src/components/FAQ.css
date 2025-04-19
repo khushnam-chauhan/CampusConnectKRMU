@@ -1,71 +1,77 @@
 .faq {
-    display: flex;
-    flex-direction: column;
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.faq-head {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #00b894;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.faq-qs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fqs {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 1rem 1.2rem;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.qs-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qs-head {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0;
+}
+
+.f-toggle {
+  font-size: 1.5rem;
+  color: #00b894;
+  font-weight: bold;
+}
+
+.qs-answer {
+  margin-top: 0.7rem;
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.5;
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Optional: Smooth expand animation */
+.fqs .qs-answer {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
   }
-  
-  .faq-head {
-    font-size: 40px;
-    font-weight: 600;
-    text-align: center;
-    margin: 2rem;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .faq-qs {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    margin: 2rem;
-    font-size: 20px;
-  }
-  
-  .fqs {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-  }
-  
-  .qs-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 10px;
-    background: #f9f9f9;
-    border-radius: 5px;
-    transition: background 0.3s ease-in-out;
-  }
-  
-  .qs-container:hover {
-    background: #e0e0e0;
-  }
-  
-  .qs-head {
-    font-weight: bold;
-  }
-  
-  .f-toggle {
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .qs-answer {
-    font-size: 18px;
-    padding: 10px;
-    background: #fff;
-    border-radius: 5px;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
+}
