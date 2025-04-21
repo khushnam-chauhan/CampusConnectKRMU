@@ -1,9 +1,32 @@
-.hiring-section{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-.hiring-heading{
-    font-size: 40px;
-}
+.hiring-section {
+    max-width: 1200px; /* Prevents stretching on large screens */
+    margin: 0 auto; /* Centers the section */
+    padding: 40px 20px;
+    text-align: center;
+  }
+  
+  .hiring-heading {
+    font-size: 2.5rem;
+    color: #333;
+    margin-bottom: 30px;
+  }
+  
+  .hiring {
+    width: 100%;
+    max-width: 1000px; /* Keeps image from stretching too much */
+    height: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    border-radius: 8px;
+  }
+  @media (max-width: 768px) {
+    .hiring-heading {
+      font-size: 1.8rem;
+    }
+  
+    .hiring {
+      max-width: 90%;
+    }
+  }
+    

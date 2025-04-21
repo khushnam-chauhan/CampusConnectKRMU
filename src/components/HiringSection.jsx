@@ -1,5 +1,6 @@
 import React from 'react'
 import './HiringSection.css'
+import company from '../assets/company.png' 
 function HiringSection() {
   return (
     <div className='hiring-section'>
@@ -7,7 +8,7 @@ function HiringSection() {
             <h1  className='hiring-heading'>Top Hiring Companies</h1>
         </div>
         <div>
-            companies
+            <img className='hiring' src={company} alt="Hiring companies " />
         </div>
     </div>
   )
